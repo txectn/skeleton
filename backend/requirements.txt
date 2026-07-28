@@ -1,0 +1,35 @@
+Django==6.0.3
+
+# Django REST API
+djangorestframework==3.17.0
+djangorestframework_simplejwt==5.5.1
+
+# Frontend (React/Hydrogen) -> Django API
+django-cors-headers==4.9.0
+
+# Environment variables
+django-environ==0.13.0
+
+# PostgreSQL
+psycopg2-binary==2.9.11
+
+# Image handling
+Pillow==12.1.1
+
+# Media storage (Cloudinary)
+cloudinary==1.44.1
+django-cloudinary-storage==0.3.0
+django-storages==1.14.6
+
+# Automatically remove old uploaded files
+django-cleanup==9.0.0
+
+# Database URL parser (Render, Railway, etc.)
+dj-database-url==3.0.1
+
+# HTTP requests (payment gateways, APIs, etc.)
+requests==2.32.5
+
+# Production server
+gunicorn==26.0.0
+whitenoise==6.12.0
