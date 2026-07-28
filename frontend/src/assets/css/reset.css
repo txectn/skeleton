@@ -1,0 +1,42 @@
+* {
+  margin: 0;
+  padding: 0;
+  outline: none;
+  box-sizing: border-box;
+  border: none;
+  text-decoration: none;
+  font-family: var(--ff-inter);
+}
+
+html {
+  font-size: 62.5%;
+}
+
+body {
+  background-color: var(--bg-main);
+  color: var(--text-main);
+}
+
+@media (max-width: 600px) {
+  * {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  *::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* buttons */
+button {
+  cursor: pointer;
+  background-color: transparent;
+}
+
+a,
+button {
+  -webkit-tap-highlight-color: transparent;
+  -ms-touch-action: manipulation;
+  touch-action: manipulation;
+}

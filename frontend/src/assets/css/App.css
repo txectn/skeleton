@@ -1,0 +1,196 @@
+/* 1. Register the variable font */
+font-face {
+  font-family: "Inter";
+  src: url("../fonts/InterVariable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+	/* Color Palette */
+	--color-main: #ffffff;
+	--color-inverse: #000000;
+
+	--bg-main: #ffffff;
+	--bg-surface: #f8fafc;
+	--bg-element: #f5f7fa;
+	--bg-inverse: #000000;
+	--bg-hover: #eff0f2;
+	--bg-hover2: rgb(255, 57, 39);
+
+	--text-main: #000000;
+	--text-muted-100: #4E5562;
+	--text-muted-70: #64748b;
+	--text-inverse: #ffffff;
+
+	--shadow-80: rgba(0, 0, 0, 0.1);
+	--shadow-90: rgba(0, 0, 0, 0.2);
+	--shadow-100: rgba(0, 0, 0, 0.3);
+
+	--border-main: #e2e8f0;
+	--border-surface: #ffffff;
+	--border-element: #94a3b8;
+	--border-inverse: #000000;
+
+	--brand-primary: #2563eb;
+	--status-error: #dc2626;
+	--status-success: #16a34a;
+
+	/* Font Family */
+	--ff-inter: 'Inter', sans-serif;
+
+	/* Font Size */
+	--fs-xs: 1.2rem;
+	--fs-sm: 1.4rem;
+	--fs-base: 1.6rem;
+	--fs-md: 1.8rem;
+	--fs-lg: 2.0rem;
+	--fs-xl: 2.4rem;
+	--fs-xxl: 2.8rem;
+	--fs-xxxl: 3.2rem;
+	--fs-display: 5.5rem;
+
+	/* Font Weight */
+	--fw-regular: 400;
+	--fw-medium: 500;
+	--fw-semibold: 600;
+	--fw-bold: 700;
+}
+
+/* common layout css */
+.layout-wrapper {
+	padding: 0 2rem;
+	width: 100%;
+}
+
+.layout {
+	width: 100%;
+	max-width: 1200px;
+	margin: 0 auto;
+}
+
+.title-wrapper {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	gap: 0.8rem;
+}
+
+.title {
+	font-size: var(--fs-xxl);
+	font-weight: var(--fw-semibold);
+	color: var(--text-main);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.subtitle {
+	font-size: var(--fs-base);
+	color: var(--text-muted-70);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+@media(max-width: 600px) {
+	.title-wrapper {
+		gap: 2rem;
+	}
+
+	.title {
+		font-size: var(--fs-xl);
+	}
+
+	.subtitle {
+		font-size: 1.35rem;
+	}
+}
+
+/* button util */
+.btn {
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	background-color: transparent;
+	color: var(--text-main);
+	transition: background-color 0.3s ease;
+}
+
+@media(hover: hover) {
+	.btn-hover:hover {
+		background-color: var(--bg-hover);
+	}
+}
+
+.hover-active {
+	background-color: var(--bg-hover);
+}
+
+.btn-content {
+	z-index: 2;
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	height: 100%;
+	font-size: var(--fs-sm);
+	font-weight: var(--fw-regular);
+	color: var(--text-main);
+}
+
+.btn-overlay {
+	width: 100%;
+	height: 100%;
+	padding: 1rem;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	transition: background-color 0.3s ease;
+	z-index: 1;
+}
+
+.btn-overlay-padding {
+	width: calc(100% + 2rem);
+	height: calc(100% + 2rem);
+}
+
+@media(pointer: fine) {
+	.btn:hover .btn-overlay {
+		background-color: var(--bg-hover);
+	}
+}
+
+/* underline util */
+.underline {
+	position: relative;
+	transition: width 0.3s ease;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.underline::after {
+	content: "";
+	position: absolute;
+	left: 0;
+	bottom: -0.5rem;
+	width: 0;
+	height: 1px;
+	background-color: var(--bg-inverse);
+	transition: width 0.3s ease;
+}
+
+@media(hover: hover) {
+	.underline:hover::after {
+		width: 100%;
+	}
+}
+
+.underline-active::after {
+	width: 100%;
+}
