@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     "django_cleanup.apps.CleanupConfig",
 
     # Project apps
+    "accounts",
 ]
 
 # Middleware
@@ -198,3 +199,11 @@ CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS", default=[])
 
 # Default primary key
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Authentication
+AUTH_USER_MODEL = "accounts.User"
+
+# Clerk Provider
+CLERK_SECRET_KEY = env.str("CLERK_SECRET_KEY")
+CLERK_AUTHORIZED_PARTIES = env.list("CLERK_AUTHORIZED_PARTIES", default=[])
+
