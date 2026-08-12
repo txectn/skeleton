@@ -14,8 +14,10 @@ class Profile(models.Model):
         related_name="profile",
     )
 
-    avatar = models.URLField(
+    avatar = models.ImageField(
+        upload_to="avatars/",
         blank=True,
+        null=True,
     )
 
     phone_number = models.CharField(

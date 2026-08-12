@@ -1,7 +1,6 @@
 from django.conf import settings
 from django.db import models
 
-
 class LoginHistory(models.Model):
     class Provider(models.TextChoices):
         EMAIL = "email", "Email"
@@ -24,6 +23,10 @@ class LoginHistory(models.Model):
     email = models.EmailField(
         blank=True,
         null=True,
+    )
+
+    success = models.BooleanField(
+        default=True,
     )
 
     ip_address = models.GenericIPAddressField(

@@ -1,10 +1,8 @@
-from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from ..serializers import SocialLoginSerializer
-from ..services.authService import AuthService
-
+from ..services import AuthService
 
 class AuthView(APIView):
     authentication_classes = []
@@ -18,7 +16,6 @@ class AuthView(APIView):
         return Response(
             result,
             # result["data"],
-            # status=result.get("status", status.HTTP_200_OK),
         )
 
 

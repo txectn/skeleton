@@ -10,8 +10,6 @@ The purpose of education is not simply to transfer information or prepare studen
 
 Its purpose is to develop individuals who can understand new concepts, solve unfamiliar problems, learn independently, and continue growing throughout their lives.
 
-The goal is to teach students how to learn, not simply what to learn.
-
 ---
 
 2. Core Philosophy
@@ -50,6 +48,10 @@ When every layer performs its responsibility correctly, the complete system work
 
 Example
 
+1 + 3 + 5 + 2 = 11
+
+Now let's break this problem into layers.
+
 Layer 1
 
 1 + 3 = 4
@@ -73,6 +75,10 @@ Students should always ask:
 - What information enters this layer?
 - What information leaves this layer?
 - How does it connect to the next layer?
+
+These are only the beginning of the questions. 
+If you can get the answer with a question, then it’s okay. 
+If you fail, change the question and ask it from a different angle.
 
 Learning in layers allows students to understand systems instead of memorizing results.
 
@@ -219,3 +225,128 @@ The ability to learn remains valuable throughout life.
 Therefore, the highest goal of education is not to create students who know everything.
 
 It is to create students who can learn anything.
+
+
+
+
+
+
+Script:
+
+Welcome to the (Effective Learning) how Learning Works series.
+
+In this series, we'll explore the principles that help you learn faster, understand more deeply, and remember information for longer.
+
+This is a Framework for Independent Learning, Problem Solving, and Lifelong growth.
+
+The purpose of education is not simply to transfer information or prepare students for examinations.
+Its purpose is to develop individuals who can understand new concepts, solve unfamiliar problems, learn independently, and continue growing throughout their lives.
+
+
+Today, we'll begin with one of those principles: Layer-Based Learning.
+
+
+
+
+
+
+Script:
+
+Welcome to the How Learning Works series.
+
+In this series, we'll explore the principles that help you learn faster, understand more deeply, and remember information for longer.
+
+These principles aren't just study techniques. Together, they form a framework for developing independent learners who can understand new concepts, solve unfamiliar problems, and continue learning throughout their lives.
+
+Today, we'll begin with one of those principles: Layer-Based Learning.
+
+--
+
+What is Layer-Based Learning?
+
+Layer-Based Learning is the idea that every subject can be understood as a system.
+
+Every system is made of smaller parts.
+
+These parts are called layers.
+
+Each layer has:
+
+- A specific responsibility.
+- A specific input.
+- A specific output.
+- A connection to other layers.
+
+When every layer performs its responsibility correctly, the complete system works.
+
+Example
+
+1 + 3 + 5 + 2 = 11
+
+Now let's break this problem into layers.
+
+Layer 1
+
+1 + 3 = 4
+
+Layer 2
+
+5 + 2 = 7
+
+Layer 3
+
+4 + 7 = 11
+
+The answer 11 is not the important part.
+
+What's important is understanding how each layer transforms its input into an output, and how that output becomes the input for the next layer.
+
+This is how deep understanding is built.
+
+Whenever you're learning something new, ask questions such as:
+
+- What does this layer do?
+- Why does it exist?
+- What information enters this layer?
+- What information leaves this layer?
+- How does it connect to the next layer?
+
+These are only the beginning of the questions.
+
+If one question doesn't give you the answer, change your perspective and ask a different one.
+
+The goal isn't to memorize results.
+
+The goal is to understand how the system works by understanding each layer within it.
+
+--
+
+Now we have a framework for understanding something effectively. But one problem still remains: how do we retain that information for the long term?
+
+Don't worry—we'll cover that in this series as well.
+
+For now, let's focus on Layer-Based Learning.
+
+-- 
+
+Now you can say you have learned layer based learning. But lets give you some practical example so you can understand its value more deeply.
+
+--
+
+
+(a+b)^2 = a^2 + b^2 + 2ab
+
+whoever never saw this formula or whoever saw this it is doesnt Matter. there is very little possibility you know how this formula CanvasCaptureMediaStreamTrack.apply
+Now question is you memorize it or you understand it?
+
+well most of you maybe memorize. but no problem lets break it down with our layer based learning
+
+^2 - this mean what? this mean base value will multiply by it self. so if it become 4 then it will multiply by it self 4 Times.
+
+same for this formula a + b is base. now if we multiply a + b with a + b then it will look like this 
+
+(a + b) * (a + b) = a^2 + b^2 + 2ab
+
+lets break it into layer : 
+
+(a + b) * (a + b) = we will multiply second base with

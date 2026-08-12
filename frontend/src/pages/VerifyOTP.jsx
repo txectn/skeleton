@@ -477,7 +477,7 @@ export default function VerifyOTP() {
       };
 
       const apiResponse = await axios.post(
-        "http://192.168.0.128:8000/api/auth/",
+        "http://127.0.0.1:8000/api/auth/",
         {
           provider: "clerk",
           device: deviceData,

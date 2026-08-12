@@ -52,6 +52,7 @@ INSTALLED_APPS = [
 
     # Project apps
     "accounts",
+    "common",
 ]
 
 # Middleware
@@ -145,7 +146,8 @@ AUTH_PASSWORD_VALIDATORS = [
 # Django REST Framework
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
-        "rest_framework_simplejwt.authentication.JWTAuthentication",
+        # "rest_framework_simplejwt.authentication.JWTAuthentication",
+        "accounts.authentication.VersionedJWTAuthentication",
     ),
     "DEFAULT_PERMISSION_CLASSES": (
         "rest_framework.permissions.IsAuthenticated",
@@ -157,12 +159,38 @@ REST_FRAMEWORK = {
 
 # JWT
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
-    "ROTATE_REFRESH_TOKENS": False,
-    "BLACKLIST_AFTER_ROTATION": False,
-    "AUTH_HEADER_TYPES": ("Bearer",),
+    "ACCESS_TOKEN_LIFETIME": timedelta(
+        minutes=env.int(
+            "ACCESS_TOKEN_LIFETIME_MINUTES",
+            default=30,
+        ),
+    ),
+
+    "REFRESH_TOKEN_LIFETIME": timedelta(
+        days=env.int(
+            "REFRESH_TOKEN_LIFETIME_DAYS",
+            default=1,
+        ),
+    ),
+
+    "ROTATE_REFRESH_TOKENS": env.bool(
+        "ROTATE_REFRESH_TOKENS",
+        default=False,
+    ),
+
+    "BLACKLIST_AFTER_ROTATION": env.bool(
+        "BLACKLIST_AFTER_ROTATION",
+        default=False,
+    ),
+
+    "AUTH_HEADER_TYPES": (
+        env.str(
+            "AUTH_HEADER_TYPES",
+            default="Bearer",
+        ),
+    ),
 }
+
 
 # Language
 LANGUAGE_CODE = "en-us"
@@ -182,6 +210,9 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # Static file storage
 STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
@@ -207,3 +238,17 @@ AUTH_USER_MODEL = "accounts.User"
 CLERK_SECRET_KEY = env.str("CLERK_SECRET_KEY")
 CLERK_AUTHORIZED_PARTIES = env.list("CLERK_AUTHORIZED_PARTIES", default=[])
 
+# Google Provider
+GOOGLE_CLIENT_ID = env.str("GOOGLE_CLIENT_ID")
+GOOGLE_CLIENT_SECRET = env.str("GOOGLE_CLIENT_SECRET")
+GOOGLE_REDIRECT_URI = env.list("GOOGLE_REDIRECT_URI")
+
+# Facebook Provider
+FACEBOOK_APP_ID = env.str("FACEBOOK_APP_ID")
+FACEBOOK_APP_SECRET = env.str("FACEBOOK_APP_SECRET")
+FACEBOOK_REDIRECT_URI = env.list("FACEBOOK_REDIRECT_URI")
+
+FACEBOOK_GRAPH_API_VERSION = env.str(
+    "FACEBOOK_GRAPH_API_VERSION",
+    default="v23.0",
+)
