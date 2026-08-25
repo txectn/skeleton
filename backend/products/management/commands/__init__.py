@@ -1,0 +1,1 @@
+from .import_synonyms import Command

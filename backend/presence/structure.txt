@@ -1,0 +1,19 @@
+presence/
+├── models/
+│   ├── __init__.py
+│   └── presence.py
+│
+├── views/
+│   ├── __init__.py
+│   └── heartbeat.py
+│
+├── serializers/
+│   ├── __init__.py
+│   └── presence.py
+│
+├── services/
+│   ├── __init__.py
+│   └── presence.py
+│
+├── urls.py
+└── apps.py

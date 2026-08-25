@@ -1,0 +1,401 @@
+{
+  "Mobile / Phone": [
+    "mobile",
+    "phone",
+    "smartphone",
+    "cell phone",
+    "cellphone"
+  ],
+  "Tablet": [
+    "tablet",
+    "tablet pc",
+    "tab"
+  ],
+  "Laptop / Notebook": [
+    "laptop",
+    "notebook",
+    "notebook computer"
+  ],
+  "Desktop Computer": [
+    "desktop",
+    "desktop computer",
+    "pc",
+    "personal computer"
+  ],
+  "Monitor / Display": [
+    "monitor",
+    "display",
+    "computer monitor",
+    "screen"
+  ],
+  "Keyboard": [
+    "keyboard",
+    "computer keyboard",
+    "wireless keyboard"
+  ],
+  "Mouse": [
+    "mouse",
+    "computer mouse",
+    "wireless mouse"
+  ],
+  "Mouse Pad": [
+    "mouse pad",
+    "mousepad",
+    "desk mat"
+  ],
+  "Earbuds / Earphones": [
+    "earbuds",
+    "earbud",
+    "earphone",
+    "earphones",
+    "tws",
+    "true wireless earbuds",
+    "true wireless earphones"
+  ],
+  "Headphones": [
+    "headphone",
+    "headphones",
+    "headset"
+  ],
+  "Bluetooth Speaker": [
+    "bluetooth speaker",
+    "portable speaker",
+    "wireless speaker"
+  ],
+  "Speaker": [
+    "speaker",
+    "speakers",
+    "sound speaker"
+  ],
+  "Charger": [
+    "charger",
+    "charging adapter",
+    "power adapter",
+    "charging brick"
+  ],
+  "Fast Charger": [
+    "fast charger",
+    "quick charger",
+    "rapid charger",
+    "fast charging adapter"
+  ],
+  "Wireless Charger": [
+    "wireless charger",
+    "wireless charging pad",
+    "wireless charging dock"
+  ],
+  "Charging Cable": [
+    "charging cable",
+    "charge cable",
+    "charger cable"
+  ],
+  "USB Cable": [
+    "usb cable",
+    "usb cord",
+    "usb wire"
+  ],
+  "USB Type C Cable": [
+    "usb c cable",
+    "usb type c cable",
+    "type c cable",
+    "type-c cable",
+    "usb-c cable"
+  ],
+  "Lightning Cable": [
+    "lightning cable",
+    "iphone charging cable",
+    "apple charging cable"
+  ],
+  "Micro USB Cable": [
+    "micro usb cable",
+    "micro usb charger cable",
+    "micro usb cord"
+  ],
+  "Power Bank": [
+    "power bank",
+    "powerbank",
+    "portable charger",
+    "battery pack",
+    "portable battery"
+  ],
+  "Phone Cover / Case": [
+    "phone cover",
+    "mobile cover",
+    "phone case",
+    "mobile case",
+    "back cover",
+    "smartphone case",
+    "smartphone cover"
+  ],
+  "Phone Screen Protector": [
+    "screen protector",
+    "screen guard",
+    "screen protection",
+    "display protector"
+  ],
+  "Tempered Glass": [
+    "tempered glass",
+    "tempered glass protector",
+    "glass screen protector",
+    "tempered screen protector"
+  ],
+  "Phone Holder": [
+    "phone holder",
+    "mobile holder",
+    "smartphone holder",
+    "phone stand"
+  ],
+  "Car Phone Holder": [
+    "car phone holder",
+    "car mobile holder",
+    "car phone mount",
+    "car mobile mount"
+  ],
+  "Phone Stand": [
+    "phone stand",
+    "mobile stand",
+    "smartphone stand",
+    "phone desk stand"
+  ],
+  "Smartwatch": [
+    "smartwatch",
+    "smart watch",
+    "smart wristwatch"
+  ],
+  "Smart Band": [
+    "smart band",
+    "fitness band",
+    "fitness tracker",
+    "activity tracker"
+  ],
+  "Watch Strap": [
+    "watch strap",
+    "watch band",
+    "smartwatch strap",
+    "smartwatch band"
+  ],
+  "Camera": [
+    "camera",
+    "digital camera",
+    "photo camera"
+  ],
+  "Action Camera": [
+    "action camera",
+    "sports camera",
+    "adventure camera"
+  ],
+  "CCTV Camera": [
+    "cctv camera",
+    "security camera",
+    "surveillance camera",
+    "security cam"
+  ],
+  "Webcam": [
+    "webcam",
+    "web camera",
+    "computer camera",
+    "pc camera"
+  ],
+  "Router": [
+    "router",
+    "wifi router",
+    "wireless router",
+    "internet router"
+  ],
+  "WiFi Router": [
+    "wifi router",
+    "wi-fi router",
+    "wireless router"
+  ],
+  "WiFi Adapter": [
+    "wifi adapter",
+    "wi-fi adapter",
+    "wireless adapter",
+    "wifi dongle"
+  ],
+  "Bluetooth Adapter": [
+    "bluetooth adapter",
+    "bluetooth dongle",
+    "bluetooth receiver"
+  ],
+  "USB Hub": [
+    "usb hub",
+    "usb splitter",
+    "usb port hub"
+  ],
+  "Memory Card": [
+    "memory card",
+    "sd card",
+    "storage card"
+  ],
+  "MicroSD Card": [
+    "microsd",
+    "micro sd",
+    "micro sd card",
+    "microsd card"
+  ],
+  "Flash Drive": [
+    "flash drive",
+    "usb flash drive",
+    "usb drive",
+    "pen drive",
+    "pendrive"
+  ],
+  "Hard Drive": [
+    "hard drive",
+    "hdd",
+    "hard disk",
+    "hard disk drive"
+  ],
+  "SSD": [
+    "ssd",
+    "solid state drive",
+    "solid state disk"
+  ],
+  "RAM / Memory": [
+    "ram",
+    "memory",
+    "computer memory",
+    "system memory"
+  ],
+  "Power Strip": [
+    "power strip",
+    "extension board",
+    "extension socket",
+    "power extension"
+  ],
+  "Extension Cable": [
+    "extension cable",
+    "extension cord",
+    "power extension cable"
+  ],
+  "Adapter": [
+    "adapter",
+    "adaptor",
+    "converter adapter"
+  ],
+  "HDMI Cable": [
+    "hdmi cable",
+    "hdmi cord",
+    "hdmi wire"
+  ],
+  "DisplayPort Cable": [
+    "displayport cable",
+    "display port cable",
+    "dp cable"
+  ],
+  "AUX Cable": [
+    "aux cable",
+    "aux cord",
+    "audio cable",
+    "3.5mm audio cable"
+  ],
+  "OTG Adapter": [
+    "otg adapter",
+    "usb otg",
+    "otg cable",
+    "otg connector"
+  ],
+  "Phone Ring Holder": [
+    "phone ring",
+    "phone ring holder",
+    "mobile ring holder",
+    "finger ring holder"
+  ],
+  "Selfie Stick": [
+    "selfie stick",
+    "selfie pole",
+    "selfie monopod"
+  ],
+  "Tripod": [
+    "tripod",
+    "camera tripod",
+    "phone tripod",
+    "mobile tripod"
+  ],
+  "Gaming Mouse": [
+    "gaming mouse",
+    "gamer mouse",
+    "gaming computer mouse"
+  ],
+  "Gaming Keyboard": [
+    "gaming keyboard",
+    "gamer keyboard",
+    "mechanical gaming keyboard"
+  ],
+  "Mechanical Keyboard": [
+    "mechanical keyboard",
+    "mechanical keys keyboard"
+  ],
+  "Gaming Headset": [
+    "gaming headset",
+    "gaming headphones",
+    "gamer headset"
+  ],
+  "Game Controller": [
+    "game controller",
+    "gaming controller",
+    "controller",
+    "gamepad",
+    "game pad"
+  ],
+  "Power Supply": [
+    "power supply",
+    "psu",
+    "power supply unit"
+  ],
+  "Computer Case": [
+    "computer case",
+    "pc case",
+    "desktop case",
+    "cpu case"
+  ],
+  "CPU Cooler": [
+    "cpu cooler",
+    "processor cooler",
+    "cpu fan",
+    "processor fan"
+  ],
+  "Laptop Stand": [
+    "laptop stand",
+    "notebook stand",
+    "laptop holder"
+  ],
+  "Laptop Bag": [
+    "laptop bag",
+    "notebook bag",
+    "computer bag",
+    "laptop carrying bag"
+  ],
+  "Backpack": [
+    "backpack",
+    "rucksack",
+    "school backpack",
+    "travel backpack"
+  ],
+  "USB Fan": [
+    "usb fan",
+    "usb powered fan",
+    "mini usb fan"
+  ],
+  "LED Light": [
+    "led light",
+    "led lamp",
+    "led lighting"
+  ],
+  "Night Light": [
+    "night light",
+    "night lamp",
+    "bedside lamp"
+  ],
+  "Smart Light": [
+    "smart light",
+    "smart bulb",
+    "smart lamp"
+  ],
+  "Power Bank Cable": [
+    "power bank cable",
+    "powerbank cable",
+    "power bank charging cable"
+  ]
+}

@@ -1,0 +1,1 @@
+from .metricsTask import record_product_view

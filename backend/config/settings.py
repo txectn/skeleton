@@ -38,6 +38,8 @@ if ENV == "production":
 
 # Installed apps
 INSTALLED_APPS = [
+    "unfold",
+    
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -49,10 +51,14 @@ INSTALLED_APPS = [
     "rest_framework",
     "corsheaders",
     "django_cleanup.apps.CleanupConfig",
+    "django_filters",
 
     # Project apps
     "accounts",
     "common",
+    "products",
+    "productMetrics",
+    "presence",
 ]
 
 # Middleware
@@ -115,11 +121,24 @@ LOGGING = {
 }
 
 # Cache
+# CACHES = {
+#     "default": {
+#         "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+#         "LOCATION": "default-cache",
+#     }
+# }
+
 CACHES = {
     "default": {
-        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
-        "LOCATION": "default-cache",
-    }
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": env(
+            "REDIS_CACHE_URL",
+            default="redis://127.0.0.1:6379/1",
+        ),
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        },
+    },
 }
 
 # Database
@@ -155,6 +174,17 @@ REST_FRAMEWORK = {
     "DEFAULT_RENDERER_CLASSES": (
         "rest_framework.renderers.JSONRenderer",
     ),
+
+    # Throttling settings
+    "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.AnonRateThrottle",
+        "rest_framework.throttling.UserRateThrottle",
+    ],
+
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": "100/minute",
+        "user": "500/minute",
+    },
 }
 
 # JWT
@@ -227,6 +257,9 @@ CORS_ALLOWED_ORIGINS = env.list("CORS_ALLOWED_ORIGINS", default=[])
 
 # CSRF
 CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS", default=[])
+
+# Redis database 0 used as the Celery message broker
+CELERY_BROKER_URL = env.str("CELERY_BROKER_URL", default="redis://localhost:6379/0")
 
 # Default primary key
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
