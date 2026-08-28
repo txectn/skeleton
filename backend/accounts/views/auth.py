@@ -1,10 +1,15 @@
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from rest_framework.throttling import ScopedRateThrottle
+
 from ..serializers import SocialLoginSerializer
 from ..services import AuthService
 
 class AuthView(APIView):
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "auth_throttle"
+
     authentication_classes = []
     permission_classes = []
 
@@ -15,16 +20,16 @@ class AuthView(APIView):
         result = AuthService.login(request=request, **serializer.validated_data)
         return Response(
             result,
-            # result["data"],
         )
 
-
-# Flow
-# Login with any provider.
-# Determine the authentication provider from the serializer data.
-# Verify the provider token and email.
-# Check if the user exists; create if not.
-# Create JWT tokens.
-# Store the refresh token and device data in the user session.
-# Create a login history record.
-# Return the JWT tokens.
+'''
+Flow
+Login with any provider.
+Determine the authentication provider from the serializer data.
+Verify the provider token and email.
+Check if the user exists; create if not.
+Create JWT tokens.
+Store the refresh token and device data in the user session.
+Create a login history record.
+Return the JWT tokens.
+'''

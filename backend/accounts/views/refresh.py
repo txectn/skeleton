@@ -4,7 +4,6 @@ from rest_framework.views import APIView
 
 from ..services import RefreshTokenService
 
-
 class RefreshTokenView(APIView):
     permission_classes = [AllowAny]
 

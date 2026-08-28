@@ -13,7 +13,6 @@ class InStockFilter(BaseFilter):
         in_stock = params.get(self.PARAM_NAME)
 
         if in_stock is None:
-            print("IN STOCK IS NONE ",in_stock)
             return queryset
 
         if in_stock == "true":

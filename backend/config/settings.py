@@ -184,6 +184,7 @@ REST_FRAMEWORK = {
     "DEFAULT_THROTTLE_RATES": {
         "anon": "100/minute",
         "user": "500/minute",
+        "auth_throttle": "10/minute",
     },
 }
 
@@ -266,6 +267,12 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Authentication
 AUTH_USER_MODEL = "accounts.User"
+
+# Captcha
+CAPTCHA_RATES = {
+    "auth_captcha": "3/min",
+    "product_captcha": "3/min",
+}
 
 # Clerk Provider
 CLERK_SECRET_KEY = env.str("CLERK_SECRET_KEY")
