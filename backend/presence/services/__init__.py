@@ -1,0 +1,6 @@
+from .presenceResolveService import PresenceResolveService
+from .presenceRecordService import PresenceRecordService
+from .fingerprintService import FingerprintService
+from .presenceMatchService import PresenceMatchService
+
+from .presenceIdentityService import PresenceIdentityService

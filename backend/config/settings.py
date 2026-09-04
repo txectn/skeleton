@@ -1,5 +1,7 @@
 from pathlib import Path
 from datetime import timedelta
+from celery.schedules import crontab
+
 import os
 
 import environ
@@ -59,6 +61,7 @@ INSTALLED_APPS = [
     "products",
     "productMetrics",
     "presence",
+    "cart",
 ]
 
 # Middleware
@@ -262,6 +265,16 @@ CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS", default=[])
 # Redis database 0 used as the Celery message broker
 CELERY_BROKER_URL = env.str("CELERY_BROKER_URL", default="redis://localhost:6379/0")
 
+CELERY_BEAT_SCHEDULE = {
+    "cleanup-guest-carts": {
+        "task": "cart.tasks.guestCartCleanupTask.cleanup_guest_carts",
+        "schedule": crontab(
+            hour=3,
+            minute=0,
+        ),
+    },
+}
+
 # Default primary key
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
@@ -272,6 +285,11 @@ AUTH_USER_MODEL = "accounts.User"
 CAPTCHA_RATES = {
     "auth_captcha": "3/min",
     "product_captcha": "3/min",
+}
+
+# Custom throttling
+CUSTOM_THROTTLE_RATES = {
+    "guest_cart_creation": "10/min",
 }
 
 # Clerk Provider

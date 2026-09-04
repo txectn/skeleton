@@ -2,7 +2,6 @@ from rest_framework import serializers
 
 from ..models import Presence
 
-
 class PresenceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Presence
@@ -21,14 +20,16 @@ class PresenceSerializer(serializers.ModelSerializer):
 
         extra_kwargs = {
             "presence_id": {
-                "required": True,
+                "required": False,
+                "allow_blank": True,
                 "validators": [],
             },
             "device_id": {
                 "required": True,
             },
             "fingerprint": {
-                "required": True,
+                "required": False,
+                "allow_blank": True,
             },
             "user_agent": {
                 "required": False,

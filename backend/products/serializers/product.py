@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from ..models import Product
+from ..models import Product, Variant
 
 from .media import MediaSerializer
 from .brand import BrandSerializer
@@ -92,6 +92,31 @@ class ProductDetailSerializer(serializers.ModelSerializer):
             "id",
         ]
 
+
+class ProductListVariantSerializer(serializers.ModelSerializer):
+
+    code = serializers.CharField(
+        source="currency.code",
+        read_only=True,
+    )
+
+    symbol = serializers.CharField(
+        source="currency.symbol",
+        read_only=True,
+    )
+
+    class Meta:
+        model = Variant
+        fields = [
+            "id",
+            "price",
+            "code",
+            "symbol",
+        ]
+        read_only_fields = [
+            "id",
+        ]
+
 class ProductListSerializer(serializers.ModelSerializer):
 
     media = MediaSerializer(
@@ -99,7 +124,7 @@ class ProductListSerializer(serializers.ModelSerializer):
         read_only=True,
     )
 
-    price = serializers.SerializerMethodField()
+    variant = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
@@ -108,14 +133,14 @@ class ProductListSerializer(serializers.ModelSerializer):
             "name",
             "slug",
             "media",
-            "price",
+            "variant",
             "is_active",
         ]
         read_only_fields = [
             "id",
         ]
 
-    def get_price(self, obj):
+    def get_variant(self, obj):
         variant = (
             obj.variants
             .filter(is_active=True)
@@ -123,4 +148,11 @@ class ProductListSerializer(serializers.ModelSerializer):
             .first()
         )
 
-        return variant.price if variant else None
+        if not variant:
+            return None
+
+        return ProductListVariantSerializer(
+            variant,
+            context=self.context,
+        ).data
+

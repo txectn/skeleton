@@ -1,5 +1,10 @@
+import uuid
+
 from django.conf import settings
 from django.db import models
+
+def generate_presence_id():
+    return uuid.uuid4().hex
 
 class Presence(models.Model):
     user = models.ForeignKey(
@@ -10,11 +15,11 @@ class Presence(models.Model):
         related_name="presences",
     )
 
-    # Visitor/device identity
     presence_id = models.CharField(
         max_length=128,
         unique=True,
         db_index=True,
+        default=generate_presence_id,
     )
 
     device_id = models.CharField(
@@ -27,11 +32,9 @@ class Presence(models.Model):
         db_index=True,
     )
 
-    # Request information
     ip_address = models.GenericIPAddressField()
     user_agent = models.TextField(blank=True)
 
-    # Parsed client information
     browser = models.CharField(
         max_length=100,
         blank=True,
@@ -57,7 +60,6 @@ class Presence(models.Model):
         blank=True,
     )
 
-    # Activity history
     first_seen_at = models.DateTimeField(
         auto_now_add=True,
     )

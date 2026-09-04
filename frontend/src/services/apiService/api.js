@@ -4,10 +4,12 @@ import { clearAuth, refreshToken } from "./refresh";
 
 export const publicApi = axios.create({
     baseURL: BASE_URL,
+    withCredentials: true
 });
 
 export const privateApi = axios.create({
     baseURL: BASE_URL,
+    withCredentials: true
 });
 
 // Request Interceptor
