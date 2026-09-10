@@ -11,6 +11,7 @@ from ..models import (
     Inventory,
     Option
 )
+from offers.models import OfferVariant
 
 class VariantInlineForm(forms.ModelForm):
     class Meta:
@@ -34,13 +35,18 @@ class InventoryInline(StackedInline):
     extra = 1
     max_num = 1
 
+class OfferVariantInline(TabularInline):
+    model = OfferVariant
+    extra = 0
+
 class VariantInline(StackedInline):
     model = Variant
     form = VariantInlineForm
-    extra = 1
+    extra = 0
 
     inlines = (
         InventoryInline,
+        OfferVariantInline,
     )
 
 class OptionInline(TabularInline):

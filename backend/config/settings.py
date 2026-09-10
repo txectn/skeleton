@@ -62,6 +62,8 @@ INSTALLED_APPS = [
     "productMetrics",
     "presence",
     "cart",
+    "reviews",
+    "offers",
 ]
 
 # Middleware
@@ -271,6 +273,27 @@ CELERY_BEAT_SCHEDULE = {
         "schedule": crontab(
             hour=3,
             minute=0,
+        ),
+    },
+    "record-product-metricsSnapshot": {
+        "task": "productMetrics.tasks.metricsTask.record_product_metrics_snapshot",
+        "schedule": crontab(
+            hour=0,
+            minute=5,
+        ),
+    },
+    "record-product-trending": {
+        "task": "productMetrics.tasks.metricsTask.record_product_trending",
+        "schedule": crontab(
+            hour=0,
+            minute=10,
+        ),
+    },
+    "record-product-popularity": {
+        "task": "productMetrics.tasks.metricsTask.update_all_product_popularity",
+        "schedule": crontab(
+            hour=0,
+            minute=15,
         ),
     },
 }

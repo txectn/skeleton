@@ -15,6 +15,8 @@ from .cartItemClearService import CartItemClearService
 
 from common.throttling import ThrottleService
 
+from productMetrics.tasks import record_product_cart_add
+
 logger = logging.getLogger(__name__)
 
 class CartService:
@@ -206,6 +208,10 @@ class CartService:
                 cart=cart,
                 variant=variant,
                 quantity=quantity,
+            )
+
+            record_product_cart_add.delay(
+               variant.product_id,
             )
 
             return cart, cart_item, increase_limit_reached
