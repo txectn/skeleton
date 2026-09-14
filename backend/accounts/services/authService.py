@@ -14,6 +14,8 @@ from .jwtService import JWTService
 from .userSessionService import UserSessionService
 from .loginHistoryService import LoginHistoryService
 
+from ..tasks import create_login_history
+
 logger = logging.getLogger(__name__)
 
 class AuthService:
@@ -90,24 +92,22 @@ class AuthService:
                 "first_name": user.first_name,
                 "last_name": user.last_name,
             }
-
+        
         finally:
             try:
-                LoginHistoryService.create(
-                    user=user,
+                create_login_history.delay(
+                    user_id=user.id if user else None,
                     provider=provider,
                     provider_user=provider_user,
                     device=device,
                     ip_address=ip_address,
                     success=user is not None,
                 )
-                
+
             except Exception:
                 logger.exception(
-                    "Failed to create login history."
+                    "Failed to queue login history task."
                 )
-
-
 
 
 
