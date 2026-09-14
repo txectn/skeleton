@@ -21,23 +21,20 @@ class CartItemService:
         If the variant already exists in the cart,
         increase its quantity.
 
-        Inventory is checked before creating or
-        updating the CartItem.
+        The final cart quantity cannot exceed:
+        - available inventory
+        - variant purchase limit, if configured
 
-        If the requested quantity exceeds the
-        available inventory, the quantity is clamped
-        to the maximum available quantity.
+        Adding an item to the cart does not reserve
+        inventory. Inventory reservation happens during
+        the checkout/order flow.
 
         Returns:
             tuple:
                 (
                     cart_item,
-                    increase_limit_reached,
+                    quantity_limit_reached,
                 )
-
-        Adding an item to the cart does not reserve
-        inventory. reserved_quantity is only changed
-        during the checkout/order reservation flow.
         """
 
         # ---------------------------------------------------------
@@ -95,7 +92,19 @@ class CartItemService:
         available_quantity = inventory.available_quantity
 
         # ---------------------------------------------------------
-        # Calculate requested quantity
+        # Determine maximum allowed quantity
+        # ---------------------------------------------------------
+
+        max_quantity = available_quantity
+
+        if variant.purchase_limit is not None and variant.purchase_limit > 0:
+            max_quantity = min(
+                available_quantity,
+                variant.purchase_limit,
+            )
+
+        # ---------------------------------------------------------
+        # Calculate requested total quantity
         # ---------------------------------------------------------
 
         requested_quantity = (
@@ -103,20 +112,20 @@ class CartItemService:
         )
 
         # ---------------------------------------------------------
-        # Check inventory limit
+        # Check quantity limit
         # ---------------------------------------------------------
 
-        increase_limit_reached = (
-            requested_quantity > available_quantity
+        quantity_limit_reached = (
+            requested_quantity > max_quantity
         )
 
         # ---------------------------------------------------------
-        # Calculate new quantity
+        # Clamp quantity to maximum allowed quantity
         # ---------------------------------------------------------
 
         new_quantity = min(
             requested_quantity,
-            available_quantity,
+            max_quantity,
         )
 
         # ---------------------------------------------------------
@@ -148,5 +157,5 @@ class CartItemService:
 
         return (
             cart_item,
-            increase_limit_reached,
+            quantity_limit_reached,
         )

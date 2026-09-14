@@ -5,6 +5,8 @@ from .category import CategoryAdmin
 from .collection import CollectionAdmin
 from .tag import TagAdmin
 from .shippingClass import ShippingClassAdmin
+from .shippingClassRate import ShippingClassRateAdmin
+from .shippingZone import ShippingZoneAdmin
 from .media import MediaAdmin
 from .metafield import MetafieldAdmin
 from .variant import VariantAdmin

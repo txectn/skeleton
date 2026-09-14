@@ -22,10 +22,12 @@ class CartItemUpdateQuantityService:
             1. The CartItem must already exist.
             2. Quantity must be greater than zero.
             3. Quantity represents the new total quantity.
-            4. The quantity must not exceed available inventory.
-            5. If the requested quantity exceeds available
-               inventory, set it to the maximum available quantity.
-            6. The CartItem is never deleted.
+            4. The quantity cannot exceed available inventory.
+            5. The quantity cannot exceed the variant purchase limit,
+               when a purchase limit is configured.
+            6. If the requested quantity exceeds the effective
+               maximum, it is clamped to that maximum.
+            7. The CartItem is never deleted.
 
         Returns:
             tuple:
@@ -35,8 +37,8 @@ class CartItemUpdateQuantityService:
                 )
 
         Updating a CartItem does not reserve inventory.
-        reserved_quantity is only changed during the
-        checkout/order reservation flow.
+        Inventory reservation happens during the
+        checkout/order flow.
         """
 
         # ---------------------------------------------------------
@@ -97,11 +99,23 @@ class CartItemUpdateQuantityService:
         available_quantity = inventory.available_quantity
 
         # ---------------------------------------------------------
+        # Determine maximum allowed quantity
+        # ---------------------------------------------------------
+
+        max_quantity = available_quantity
+
+        if variant.purchase_limit is not None:
+            max_quantity = min(
+                available_quantity,
+                variant.purchase_limit,
+            )
+
+        # ---------------------------------------------------------
         # Check quantity limit
         # ---------------------------------------------------------
 
         quantity_limit_reached = (
-            quantity > available_quantity
+            quantity > max_quantity
         )
 
         # ---------------------------------------------------------
@@ -110,7 +124,7 @@ class CartItemUpdateQuantityService:
 
         new_quantity = min(
             quantity,
-            available_quantity,
+            max_quantity,
         )
 
         # ---------------------------------------------------------

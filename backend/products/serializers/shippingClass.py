@@ -8,7 +8,6 @@ class ShippingClassSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "name",
-            "delivery_charge",
         ]
         read_only_fields = [
             "id",

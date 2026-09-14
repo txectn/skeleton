@@ -16,6 +16,7 @@ class VariantAdmin(ModelAdmin):
         "price",
         "compare_at_price",
         "cost_price",
+        "purchase_limit",
         "position",
         "is_active",
         "created_at",

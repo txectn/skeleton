@@ -1,6 +1,6 @@
 from django.db import models
 
-class Offer(models.Model):
+class Promotion(models.Model):
 
     class DiscountType(models.TextChoices):
         PERCENTAGE = "percentage", "Percentage"
@@ -27,10 +27,6 @@ class Offer(models.Model):
     priority = models.PositiveIntegerField(
         default=0,
     )
-
-    starts_at = models.DateTimeField()
-
-    ends_at = models.DateTimeField()
 
     is_active = models.BooleanField(
         default=True,

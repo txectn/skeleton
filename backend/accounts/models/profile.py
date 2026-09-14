@@ -36,7 +36,13 @@ class Profile(models.Model):
         blank=True,
     )
 
-    address = models.TextField(
+    country = models.CharField(
+        max_length=100,
+        blank=True,
+    )
+
+    region = models.CharField(
+        max_length=100,
         blank=True,
     )
 
@@ -45,8 +51,7 @@ class Profile(models.Model):
         blank=True,
     )
 
-    country = models.CharField(
-        max_length=100,
+    address = models.TextField(
         blank=True,
     )
 

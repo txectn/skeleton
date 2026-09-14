@@ -6,7 +6,7 @@ from .model import Model
 from .category import Category
 from .collection import Collection
 from .tag import Tag
-from .shippingClass import ShippingClass
+from .shippingClassRate import ShippingClassRate
 
 class Product(models.Model):
     name = models.CharField(
@@ -54,10 +54,12 @@ class Product(models.Model):
         blank=True,
     )
 
-    shipping_class = models.ForeignKey(
-        ShippingClass,
-        on_delete=models.PROTECT,
+    shipping_class_rates = models.ForeignKey(
+        ShippingClassRate,
         related_name="products",
+        on_delete=models.PROTECT,
+        blank=True,
+        null=True,
     )
 
     is_active = models.BooleanField(

@@ -2,17 +2,15 @@ from django.contrib import admin
 
 from unfold.admin import ModelAdmin
 
-from .models import Offer, OfferVariant
+from .models import Promotion, PromotionVariant
 
-@admin.register(Offer)
-class OfferAdmin(ModelAdmin):
+@admin.register(Promotion)
+class PromotionAdmin(ModelAdmin):
     list_display = (
         "name",
         "discount_type",
         "discount_value",
         "priority",
-        "starts_at",
-        "ends_at",
         "is_active",
         "created_at",
     )
@@ -39,7 +37,7 @@ class OfferAdmin(ModelAdmin):
 
     fieldsets = (
         (
-            "Offer",
+            "Promotion",
             {
                 "fields": (
                     "name",
@@ -48,6 +46,62 @@ class OfferAdmin(ModelAdmin):
                     "discount_value",
                     "priority",
                     "is_active",
+                ),
+            },
+        ),
+        (
+            "Metadata",
+            {
+                "fields": (
+                    "created_at",
+                    "updated_at",
+                ),
+            },
+        ),
+    )
+
+
+@admin.register(PromotionVariant)
+class PromotionVariantAdmin(ModelAdmin):
+    list_display = (
+        "promotion",
+        "variant",
+        "starts_at",
+        "ends_at",
+        "created_at",
+    )
+
+    list_filter = (
+        "promotion__discount_type",
+        "promotion__is_active",
+    )
+
+    search_fields = (
+        "promotion__name",
+        "variant__sku",
+        "variant__product__name",
+    )
+
+    autocomplete_fields = (
+        "promotion",
+        "variant",
+    )
+
+    readonly_fields = (
+        "created_at",
+    )
+
+    ordering = (
+        "-created_at",
+    )
+
+    fieldsets = (
+        (
+            "Assignment",
+            {
+                "fields": (
+                    "promotion",
+                    "variant",
                 ),
             },
         ),
@@ -65,40 +119,7 @@ class OfferAdmin(ModelAdmin):
             {
                 "fields": (
                     "created_at",
-                    "updated_at",
                 ),
             },
         ),
-    )
-
-@admin.register(OfferVariant)
-class OfferVariantAdmin(ModelAdmin):
-    list_display = (
-        "offer",
-        "variant",
-        "created_at",
-    )
-
-    list_filter = (
-        "offer__discount_type",
-        "offer__is_active",
-    )
-
-    search_fields = (
-        "offer__name",
-        "variant__sku",
-        "variant__product__name",
-    )
-
-    autocomplete_fields = (
-        "offer",
-        "variant",
-    )
-
-    readonly_fields = (
-        "created_at",
-    )
-
-    ordering = (
-        "-created_at",
     )

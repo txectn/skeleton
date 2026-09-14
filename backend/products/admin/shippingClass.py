@@ -8,7 +8,6 @@ from ..models import ShippingClass
 class ShippingClassAdmin(ModelAdmin):
     list_display = (
         "name",
-        "delivery_charge",
     )
 
     list_display_links = (

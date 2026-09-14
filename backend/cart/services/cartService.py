@@ -204,7 +204,7 @@ class CartService:
             # Add/update CartItem
             # ---------------------------------------------------------
 
-            cart_item, increase_limit_reached = CartItemService.add_item(
+            cart_item, quantity_limit_reached = CartItemService.add_item(
                 cart=cart,
                 variant=variant,
                 quantity=quantity,
@@ -214,7 +214,7 @@ class CartService:
                variant.product_id,
             )
 
-            return cart, cart_item, increase_limit_reached
+            return cart, cart_item, quantity_limit_reached
 
         except Exception:
             logger.exception(

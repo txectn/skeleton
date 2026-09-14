@@ -8,10 +8,11 @@ from .model import ModelSerializer
 from .category import CategorySerializer
 from .collection import CollectionSerializer
 from .tag import TagSerializer
-from .shippingClass import ShippingClassSerializer
 from .option import OptionSerializer
 from .variant import VariantSerializer
 from .metafield import MetafieldSerializer
+
+from promotions.services import PromotionResponseService
 
 class ProductDetailSerializer(serializers.ModelSerializer):
 
@@ -39,10 +40,6 @@ class ProductDetailSerializer(serializers.ModelSerializer):
 
     tags = TagSerializer(
         many=True,
-        read_only=True,
-    )
-
-    shipping_class = ShippingClassSerializer(
         read_only=True,
     )
 
@@ -78,8 +75,6 @@ class ProductDetailSerializer(serializers.ModelSerializer):
             "collections",
             "tags",
 
-            "shipping_class",
-
             "metafields",
 
             "options",
@@ -91,7 +86,6 @@ class ProductDetailSerializer(serializers.ModelSerializer):
         read_only_fields = [
             "id",
         ]
-
 
 class ProductListVariantSerializer(serializers.ModelSerializer):
 
@@ -105,6 +99,8 @@ class ProductListVariantSerializer(serializers.ModelSerializer):
         read_only=True,
     )
 
+    promotion = serializers.SerializerMethodField()
+
     class Meta:
         model = Variant
         fields = [
@@ -112,10 +108,14 @@ class ProductListVariantSerializer(serializers.ModelSerializer):
             "price",
             "code",
             "symbol",
+            "promotion",
         ]
         read_only_fields = [
             "id",
         ]
+
+    def get_promotion(self, variant):
+        return PromotionResponseService.get_promotion(variant)
 
 class ProductListSerializer(serializers.ModelSerializer):
 

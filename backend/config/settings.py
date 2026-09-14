@@ -63,7 +63,7 @@ INSTALLED_APPS = [
     "presence",
     "cart",
     "reviews",
-    "offers",
+    "promotions",
 ]
 
 # Middleware
@@ -232,7 +232,8 @@ SIMPLE_JWT = {
 LANGUAGE_CODE = "en-us"
 
 # Time zone
-TIME_ZONE = "UTC"
+# TIME_ZONE = "UTC"
+TIME_ZONE = "Asia/Dhaka"
 
 # Internationalization
 USE_I18N = True

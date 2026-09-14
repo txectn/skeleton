@@ -11,7 +11,7 @@ from ..models import (
     Inventory,
     Option
 )
-from offers.models import OfferVariant
+from promotions.models import PromotionVariant
 
 class VariantInlineForm(forms.ModelForm):
     class Meta:
@@ -35,8 +35,8 @@ class InventoryInline(StackedInline):
     extra = 1
     max_num = 1
 
-class OfferVariantInline(TabularInline):
-    model = OfferVariant
+class PromotionVariantInline(TabularInline):
+    model = PromotionVariant
     extra = 0
 
 class VariantInline(StackedInline):
@@ -46,7 +46,7 @@ class VariantInline(StackedInline):
 
     inlines = (
         InventoryInline,
-        OfferVariantInline,
+        PromotionVariantInline,
     )
 
 class OptionInline(TabularInline):
@@ -101,7 +101,7 @@ class ProductAdmin(ModelAdmin):
         "category",
         "collections",
         "tags",
-        "shipping_class",
+        "shipping_class_rates",
     )
 
     prepopulated_fields = {

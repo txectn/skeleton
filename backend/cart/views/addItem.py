@@ -17,7 +17,7 @@ class CartItemView(APIView):
         )
         serializer.is_valid(raise_exception=True)
 
-        cart, cart_item, increase_limit_reached = CartService.add_item(
+        cart, cart_item, quantity_limit_reached = CartService.add_item(
             request=request,
             **serializer.validated_data,
         )
@@ -35,8 +35,8 @@ class CartItemView(APIView):
             else None
         )
 
-        response_data["increase_limit_reached"] = (
-            increase_limit_reached
+        response_data["quantity_limit_reached"] = (
+            quantity_limit_reached
         )
 
         return Response(

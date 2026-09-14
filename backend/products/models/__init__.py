@@ -5,6 +5,8 @@ from .category import Category
 from .collection import Collection
 from .tag import Tag
 from .shippingClass import ShippingClass
+from .shippingZone import ShippingZone
+from .shippingClassRate import ShippingClassRate
 from .media import Media
 from .metafield import Metafield
 from .variant import Variant

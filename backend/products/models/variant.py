@@ -48,6 +48,11 @@ class Variant(models.Model):
         default=0,
     )
 
+    purchase_limit = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+    )
+
     is_active = models.BooleanField(
         default=True,
         db_index=True,

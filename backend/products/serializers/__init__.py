@@ -13,4 +13,6 @@ from .option_variable import OptionVariableSerializer
 from .option import OptionSerializer
 from .tag import TagSerializer
 from .shippingClass import ShippingClassSerializer
+from .shippingZone import ShippingZoneSerializer
+from .shippingClassRate import ShippingClassRateSerializer
 from .variant import VariantSerializer
