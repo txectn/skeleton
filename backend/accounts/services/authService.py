@@ -12,7 +12,6 @@ from .userService import UserService
 from .profileService import ProfileService
 from .jwtService import JWTService
 from .userSessionService import UserSessionService
-from .loginHistoryService import LoginHistoryService
 
 from ..tasks import create_login_history
 
