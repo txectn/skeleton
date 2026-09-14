@@ -9,7 +9,7 @@ class OptionSerializer(serializers.ModelSerializer):
         read_only=True,
     )
 
-    option_variable_id = serializers.IntegerField(
+    option_variable = serializers.IntegerField(
         source="option_variable.id",
         read_only=True,
     )
@@ -18,7 +18,7 @@ class OptionSerializer(serializers.ModelSerializer):
         model = Option
         fields = [
             "id",
-            "option_variable_id",
+            "option_variable",
             "name",
             "value",
             "position",

@@ -1,13 +1,11 @@
 from rest_framework import generics
-from rest_framework.response import Response
-from .serializers import (
-    ProductDetailSerializer,
+from ..serializers import (
     ProductListSerializer
 )
 
-from .models import Product
+from ..models import Product
 
-from .services import (
+from ..services import (
     ProductSearchService,
     ProductFilterService,
     ProductSortService
@@ -15,7 +13,7 @@ from .services import (
 
 from productMetrics.tasks import record_product_view
 
-from .pagination import ProductPagination
+from ..pagination import ProductPagination
 
 class ProductListView(generics.ListAPIView):
     serializer_class = ProductListSerializer
@@ -42,19 +40,3 @@ class ProductListView(generics.ListAPIView):
 
         return queryset
     
-
-class ProductDetailView(generics.RetrieveAPIView):
-    queryset = Product.objects.all()
-    serializer_class = ProductDetailSerializer
-    permission_classes = []
-    lookup_field = "slug"
-
-    def retrieve(self, request, *args, **kwargs):
-        instance = self.get_object()
-
-        record_product_view.delay(instance.id)
-
-        serializer = self.get_serializer(instance)
-
-        return Response(serializer.data)
-

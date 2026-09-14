@@ -85,6 +85,10 @@ class ProductDetailSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = [
             "id",
+            "name",
+            "slug",
+            "description",
+            "is_active",
         ]
 
 class ProductListVariantSerializer(serializers.ModelSerializer):
@@ -124,7 +128,7 @@ class ProductListSerializer(serializers.ModelSerializer):
         read_only=True,
     )
 
-    variant = serializers.SerializerMethodField()
+    variant = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Product
@@ -138,6 +142,9 @@ class ProductListSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = [
             "id",
+            "name",
+            "slug",
+            "is_active",
         ]
 
     def get_variant(self, obj):
