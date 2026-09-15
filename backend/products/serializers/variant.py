@@ -33,6 +33,7 @@ class VariantSerializer(serializers.ModelSerializer):
             "sku",
             "price",
             "compare_at_price",
+            "purchase_limit",
             "options",
             "inventory",
             "currency",
