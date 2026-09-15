@@ -24,6 +24,11 @@ class CartProductSerializer(serializers.Serializer):
         read_only=True,
     )
 
+    variant = VariantSerializer(
+        read_only=True,
+    )
+
+
 class CartItemSerializer(serializers.ModelSerializer):
     product = CartProductSerializer(
         source="*",
