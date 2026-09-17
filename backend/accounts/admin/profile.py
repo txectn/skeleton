@@ -9,14 +9,16 @@ class ProfileAdmin(admin.ModelAdmin):
         "user",
         "phone_number",
         "gender",
-        "city",
         "country",
+        "region",
+        "city",
         "created_at",
     )
 
     list_filter = (
         "gender",
         "country",
+        "region",
         "created_at",
     )
 
@@ -25,6 +27,7 @@ class ProfileAdmin(admin.ModelAdmin):
         "user__username",
         "phone_number",
         "city",
+        "region",
         "country",
     )
 
@@ -35,13 +38,15 @@ class ProfileAdmin(admin.ModelAdmin):
         "updated_at",
     )
 
-    autocomplete_fields = ("user",)
+    autocomplete_fields = (
+        "user",
+    )
 
     fieldsets = (
         ("User", {
             "fields": (
                 "user",
-            )
+            ),
         }),
         ("Personal Information", {
             "fields": (
@@ -49,19 +54,20 @@ class ProfileAdmin(admin.ModelAdmin):
                 "phone_number",
                 "date_of_birth",
                 "gender",
-            )
+            ),
         }),
         ("Address", {
             "fields": (
                 "address",
-                "city",
                 "country",
-            )
+                "region",
+                "city",
+            ),
         }),
         ("Timestamps", {
             "fields": (
                 "created_at",
                 "updated_at",
-            )
+            ),
         }),
     )
