@@ -64,6 +64,7 @@ INSTALLED_APPS = [
     "cart",
     "reviews",
     "promotions",
+    "orders",
 ]
 
 # Middleware
@@ -196,10 +197,14 @@ REST_FRAMEWORK = {
 # JWT
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(
-        minutes=env.int(
-            "ACCESS_TOKEN_LIFETIME_MINUTES",
-            default=30,
-        ),
+        # minutes=env.int(
+        #     "ACCESS_TOKEN_LIFETIME_MINUTES",
+        #     default=30,
+        # ),
+        days=env.int(
+            "ACCESS_TOKEN_LIFETIME_DAYS",
+            default=1,
+        )
     ),
 
     "REFRESH_TOKEN_LIFETIME": timedelta(
