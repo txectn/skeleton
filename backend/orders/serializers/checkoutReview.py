@@ -5,7 +5,7 @@ from products.serializers import (
     VariantSerializer,
 )
 
-class CheckoutProductSerializer(serializers.Serializer):
+class CheckoutReviewProductSerializer(serializers.Serializer):
     id = serializers.IntegerField(
         source="cart_item.variant.product.id",
         read_only=True,
@@ -27,7 +27,7 @@ class CheckoutProductSerializer(serializers.Serializer):
         read_only=True,
     )
 
-class CheckoutShippingSerializer(serializers.Serializer):
+class CheckoutReviewShippingSerializer(serializers.Serializer):
     shipping_class = serializers.SerializerMethodField()
 
     rate = serializers.DecimalField(
@@ -47,13 +47,13 @@ class CheckoutShippingSerializer(serializers.Serializer):
             "name": shipping_class.name,
         }
 
-class CheckoutItemSerializer(serializers.Serializer):
+class CheckoutReviewItemSerializer(serializers.Serializer):
     id = serializers.IntegerField(
         source="cart_item.id",
         read_only=True,
     )
 
-    product = CheckoutProductSerializer(
+    product = CheckoutReviewProductSerializer(
         source="*",
         read_only=True,
     )
@@ -62,12 +62,12 @@ class CheckoutItemSerializer(serializers.Serializer):
         read_only=True,
     )
 
-    shipping = CheckoutShippingSerializer(
+    shipping = CheckoutReviewShippingSerializer(
         read_only=True,
     )
 
-class CheckoutSerializer(serializers.Serializer):
-    items = CheckoutItemSerializer(
+class CheckoutReviewSerializer(serializers.Serializer):
+    items = CheckoutReviewItemSerializer(
         many=True,
         read_only=True,
     )

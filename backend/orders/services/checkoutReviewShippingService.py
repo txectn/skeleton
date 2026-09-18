@@ -1,6 +1,6 @@
 from decimal import Decimal
 
-class CheckoutShippingService:
+class CheckoutReviewShippingService:
 
     @staticmethod
     def calculate_rates(
@@ -12,7 +12,7 @@ class CheckoutShippingService:
             cart_item = item["cart_item"]
 
             item["shipping"] = (
-                CheckoutShippingService.calculate_rate(
+                CheckoutReviewShippingService.calculate_rate(
                     variant=cart_item.variant,
                     profile=profile,
                 )
@@ -54,12 +54,12 @@ class CheckoutShippingService:
                 ),
             }
 
-        inCountry = CheckoutShippingService.country_matches(
+        inCountry = CheckoutReviewShippingService.country_matches(
             profile=profile,
             shipping_zone=shipping_zone,
         )
 
-        inRegion = CheckoutShippingService.region_matches(
+        inRegion = CheckoutReviewShippingService.region_matches(
             profile=profile,
             shipping_zone=shipping_zone,
         )

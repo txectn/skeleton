@@ -1,1 +1,1 @@
-from .checkout import CheckoutView
+from .checkoutReview import CheckoutReviewView

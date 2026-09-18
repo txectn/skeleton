@@ -2,24 +2,24 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from ..serializers import CheckoutSerializer, CheckoutItemSerializer
-from ..services import CheckoutService
+from ..serializers import CheckoutReviewSerializer, CheckoutReviewItemSerializer
+from ..services import CheckoutReviewService
 
-class CheckoutView(APIView):
+class CheckoutReviewView(APIView):
     permission_classes = [
         IsAuthenticated,
     ]
 
     def get(self, request):
-        checkout = CheckoutService.get_checkout(
+        checkout = CheckoutReviewService.get_checkout(
             user=request.user,
         )
 
-        # serializer = CheckoutSerializer(
+        # serializer = CheckoutReviewSerializer(
         #     checkout,
         # )
         
-        serializer = CheckoutItemSerializer(
+        serializer = CheckoutReviewItemSerializer(
             checkout,
             many=True,
         )

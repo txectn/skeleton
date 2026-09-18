@@ -1,9 +1,9 @@
 from cart.services import UserCartService
 from common.services import QuantityValidator
 
-from .checkoutShippingService import CheckoutShippingService
+from .checkoutReviewShippingService import CheckoutReviewShippingService
 
-class CheckoutService:
+class CheckoutReviewService:
 
     @staticmethod
     def get_checkout(
@@ -46,7 +46,7 @@ class CheckoutService:
 
         profile = user.profile
 
-        checkout_items = CheckoutShippingService.calculate_rates(
+        checkout_items = CheckoutReviewShippingService.calculate_rates(
             items=checkout_items,
             profile=profile,
         )
