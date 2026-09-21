@@ -5,6 +5,8 @@ from .category import CategoryFilter
 from .price import PriceFilter
 from .inStock import InStockFilter
 from .promotionFilter import PromotionFilter
+from .collection import CollectionFilter
+from .tag import TagFilter
 
 class ProductFilterService:
     """
@@ -17,6 +19,8 @@ class ProductFilterService:
         PriceFilter,
         InStockFilter,
         PromotionFilter,
+        CollectionFilter,
+        TagFilter,
     )
 
     def __init__(self, filters=None):
