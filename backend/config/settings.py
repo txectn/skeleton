@@ -319,6 +319,7 @@ CAPTCHA_RATES = {
 # Custom throttling
 CUSTOM_THROTTLE_RATES = {
     "guest_cart_creation": "10/min",
+    "order_creation": "5/min",
 }
 
 # Clerk Provider

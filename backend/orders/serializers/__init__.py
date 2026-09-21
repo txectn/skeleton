@@ -4,3 +4,7 @@ from .checkoutReview import (
     CheckoutReviewItemSerializer,
     CheckoutReviewSerializer,
 )
+
+from .orderSerializer import (
+    OrderSerializer
+)
