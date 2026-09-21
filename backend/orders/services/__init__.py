@@ -1,6 +1,5 @@
 from .checkoutReviewService import CheckoutReviewService
 from .checkoutReviewShippingService import CheckoutReviewShippingService
-from .shippingService import ShippingService
 
 from .orderItemService import OrderItemService
 from .orderPriceService import OrderPriceService
