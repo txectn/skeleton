@@ -1,7 +1,7 @@
 from django.db.models import Q
 from django.utils import timezone
 
-from .base import BaseFilter
+from .base import BaseFilter 
 
 class PromotionIdFilter(BaseFilter):
     PARAM_NAME = "promotion"

@@ -11,7 +11,7 @@ from .tag import TagFilter
 
 class ProductFilterService:
     """
-    Orchestrates the product filtering pipeline.
+    Orchestrates the product filtering pipeline. 
     """
 
     FILTERS = (
