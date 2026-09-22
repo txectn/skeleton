@@ -5,6 +5,7 @@ from .category import CategoryFilter
 from .price import PriceFilter
 from .inStock import InStockFilter
 from .promotionFilter import PromotionFilter
+from .promotionId import PromotionIdFilter
 from .collection import CollectionFilter
 from .tag import TagFilter
 
@@ -19,6 +20,7 @@ class ProductFilterService:
         PriceFilter,
         InStockFilter,
         PromotionFilter,
+        PromotionIdFilter,
         CollectionFilter,
         TagFilter,
     )
