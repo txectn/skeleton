@@ -2,6 +2,7 @@ from unfold.admin import ModelAdmin, TabularInline
 from django.contrib import admin
 
 from ..models import Order, OrderItem
+from payments.models import Payment
 
 class OrderItemInline(TabularInline):
     model = OrderItem
@@ -23,6 +24,10 @@ class OrderItemInline(TabularInline):
         "discount",
         "total",
     )
+
+class PaymentInline(TabularInline):
+    model = Payment
+    extra = 0
 
 
 @admin.register(Order)
@@ -111,4 +116,5 @@ class OrderAdmin(ModelAdmin):
 
     inlines = (
         OrderItemInline,
+        PaymentInline,
     )
