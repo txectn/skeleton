@@ -65,6 +65,7 @@ INSTALLED_APPS = [
     "reviews",
     "promotions",
     "orders",
+    "payments",
 ]
 
 # Middleware
@@ -302,6 +303,12 @@ CELERY_BEAT_SCHEDULE = {
             minute=15,
         ),
     },
+    "payment-reconciliation": {
+        "task": "payments.tasks.paymentReconciliationTask.payment_reconciliation_task",
+        "schedule": crontab(
+            minute="*/30",
+        ),
+    },
 }
 
 # Default primary key
@@ -339,4 +346,30 @@ FACEBOOK_REDIRECT_URI = env.list("FACEBOOK_REDIRECT_URI")
 FACEBOOK_GRAPH_API_VERSION = env.str(
     "FACEBOOK_GRAPH_API_VERSION",
     default="v23.0",
+)
+
+
+# Bkash Payment Provider 
+BKASH_BASE_URL = env(
+    "BKASH_BASE_URL",
+)
+
+BKASH_USERNAME = env(
+    "BKASH_USERNAME",
+)
+
+BKASH_PASSWORD = env(
+    "BKASH_PASSWORD",
+)
+
+BKASH_APP_KEY = env(
+    "BKASH_APP_KEY",
+)
+
+BKASH_APP_SECRET = env(
+    "BKASH_APP_SECRET",
+)
+
+BKASH_CALLBACK_URL = env(
+    "BKASH_CALLBACK_URL",
 )
