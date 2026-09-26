@@ -11,7 +11,11 @@ class CodPaymentService:
             order=order,
         ).first()
 
-        if payment and payment.status == Payment.Status.PAID:
+        if (
+            order.status != order.Status.PENDING 
+            and payment 
+            and payment.status == Payment.Status.PAID
+        ):
             raise ValidationError(
                 {
                     "payment": (
@@ -47,9 +51,7 @@ class CodPaymentService:
             )
 
         return {
-            "payment_id": payment.id,
+            "order_status": order.status,
             "payment_method": payment.method,
             "payment_status": payment.status,
-            "order_id": order.id,
-            "order_status": order.status,
         }

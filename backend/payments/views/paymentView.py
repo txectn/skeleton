@@ -23,6 +23,7 @@ class PaymentView(APIView):
             user=request.user,
             order=serializer.validated_data["order"],
             payment_method=serializer.validated_data["payment_method"],
+            provider=serializer.validated_data["provider"],
         )
 
         return Response(

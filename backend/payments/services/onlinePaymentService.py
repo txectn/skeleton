@@ -98,11 +98,8 @@ class OnlinePaymentService:
         # ---------------------------------------------------------
 
         return {
-            "payment_id": payment.id,
-            "payment_attempt_id": payment_attempt.id,
-            "payment_method": payment.method,
-            "payment_status": payment.status,
             "provider": provider,
-            **result,
+            "payment_status": payment.status,
+            "payment_url": result["payment_url"],
         }
 

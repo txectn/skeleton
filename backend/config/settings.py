@@ -66,6 +66,8 @@ INSTALLED_APPS = [
     "promotions",
     "orders",
     "payments",
+    "dashboard",
+    "siteConfig",
 ]
 
 # Middleware
@@ -306,7 +308,7 @@ CELERY_BEAT_SCHEDULE = {
     "payment-reconciliation": {
         "task": "payments.tasks.paymentReconciliationTask.payment_reconciliation_task",
         "schedule": crontab(
-            minute="*/30",
+            minute="*/5",
         ),
     },
 }

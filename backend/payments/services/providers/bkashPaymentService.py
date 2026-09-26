@@ -173,10 +173,10 @@ class BkashPaymentService:
                 }
             )
 
-        payment_id = result.get("paymentID")
+        provider_payment_id = result.get("paymentID")
         payment_url = result.get("bkashURL")
 
-        if not payment_id or not payment_url:
+        if not provider_payment_id or not payment_url:
             payment_attempt.status = (
                 payment_attempt.Status.FAILED
             )
@@ -196,7 +196,9 @@ class BkashPaymentService:
                 }
             )
 
-        payment_attempt.provider_payment_id = payment_id
+        payment_attempt.provider_payment_id = (
+            provider_payment_id
+        )
         payment_attempt.save(
             update_fields=[
                 "provider_payment_id",
@@ -206,5 +208,4 @@ class BkashPaymentService:
 
         return {
             "payment_url": payment_url,
-            "payment_id": payment_id,
         }

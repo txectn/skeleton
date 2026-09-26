@@ -9,3 +9,8 @@ class PaymentSerializer(serializers.Serializer):
     )
 
     payment_method = serializers.CharField()
+
+    provider = serializers.CharField(
+        required=False,
+        allow_blank=True,
+    )
