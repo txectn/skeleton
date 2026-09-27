@@ -9,12 +9,55 @@ class BkashPaymentService:
     TOKEN_CACHE_KEY = "bkash_access_token"
     TOKEN_CACHE_TIMEOUT = 3300
 
+    CREATE_PAYMENT_PATH = "/tokenized/checkout/create"
+    TOKEN_GRANT_PATH = "/tokenized/checkout/token/grant"
+
+    @staticmethod
+    def _get_url(path):
+
+        return (
+            f"{settings.BKASH_BASE_URL}"
+            f"{path}"
+        )
+
+    @staticmethod
+    def _mark_attempt_failed(payment_attempt):
+
+        if payment_attempt.status != (
+            payment_attempt.Status.FAILED
+        ):
+            payment_attempt.status = (
+                payment_attempt.Status.FAILED
+            )
+
+            payment_attempt.save(
+                update_fields=[
+                    "status",
+                    "updated_at",
+                ]
+            )
+
+    @staticmethod
+    def _raise_payment_error(
+        payment_attempt,
+        message,
+    ):
+
+        BkashPaymentService._mark_attempt_failed(
+            payment_attempt,
+        )
+
+        raise ValidationError(
+            {
+                "payment": message,
+            }
+        )
+
     @staticmethod
     def get_access_token():
 
-        url = (
-            f"{settings.BKASH_BASE_URL}"
-            "/tokenized/checkout/token/grant"
+        url = BkashPaymentService._get_url(
+            BkashPaymentService.TOKEN_GRANT_PATH,
         )
 
         headers = {
@@ -29,12 +72,35 @@ class BkashPaymentService:
             "app_secret": settings.BKASH_APP_SECRET,
         }
 
-        response = requests.post(
-            url,
-            headers=headers,
-            json=data,
-            timeout=30,
-        )
+        try:
+            response = requests.post(
+                url,
+                headers=headers,
+                json=data,
+                timeout=30,
+            )
+
+        except requests.RequestException:
+            raise ValidationError(
+                {
+                    "payment": (
+                        "Unable to connect to bKash."
+                    )
+                }
+            )
+
+        try:
+            result = response.json()
+
+        except ValueError:
+            raise ValidationError(
+                {
+                    "payment": (
+                        "Invalid authentication response "
+                        "received from bKash."
+                    )
+                }
+            )
 
         if not response.ok:
             raise ValidationError(
@@ -45,8 +111,6 @@ class BkashPaymentService:
                     )
                 }
             )
-
-        result = response.json()
 
         access_token = result.get("id_token")
 
@@ -59,10 +123,31 @@ class BkashPaymentService:
                 }
             )
 
+        expires_in = result.get(
+            "expires_in",
+            BkashPaymentService.TOKEN_CACHE_TIMEOUT,
+        )
+
+        try:
+            expires_in = int(expires_in)
+
+        except (TypeError, ValueError):
+            expires_in = (
+                BkashPaymentService.TOKEN_CACHE_TIMEOUT
+            )
+
+        cache_timeout = min(
+            expires_in - 60,
+            BkashPaymentService.TOKEN_CACHE_TIMEOUT,
+        )
+
+        if cache_timeout <= 0:
+            cache_timeout = 60
+
         cache.set(
             BkashPaymentService.TOKEN_CACHE_KEY,
             access_token,
-            BkashPaymentService.TOKEN_CACHE_TIMEOUT,
+            cache_timeout,
         )
 
         return access_token
@@ -83,9 +168,8 @@ class BkashPaymentService:
                 BkashPaymentService.get_access_token()
             )
 
-        url = (
-            f"{settings.BKASH_BASE_URL}"
-            "/tokenized/checkout/create"
+        url = BkashPaymentService._get_url(
+            BkashPaymentService.CREATE_PAYMENT_PATH,
         )
 
         headers = {
@@ -96,11 +180,17 @@ class BkashPaymentService:
         }
 
         data = {
+            "mode": "0011",
+            "payerReference": (
+                f"PAYMENT-{payment_attempt.id}"
+            ),
+            "callbackURL": settings.BKASH_CALLBACK_URL,
             "amount": str(order.total),
             "currency": "BDT",
             "intent": "sale",
-            "merchantInvoiceNumber": f"ORDER-{order.id}",
-            "callbackURL": settings.BKASH_CALLBACK_URL,
+            "merchantInvoiceNumber": (
+                f"ORDER-{order.id}"
+            ),
         }
 
         try:
@@ -110,95 +200,52 @@ class BkashPaymentService:
                 json=data,
                 timeout=30,
             )
-        except requests.RequestException:
-            payment_attempt.status = (
-                payment_attempt.Status.FAILED
-            )
-            payment_attempt.save(
-                update_fields=[
-                    "status",
-                    "updated_at",
-                ]
-            )
 
-            raise ValidationError(
-                {
-                    "payment": (
-                        "Unable to connect to bKash."
-                    )
-                }
+        except requests.RequestException:
+            BkashPaymentService._raise_payment_error(
+                payment_attempt,
+                "Unable to connect to bKash.",
             )
 
         try:
             result = response.json()
-        except ValueError:
-            payment_attempt.status = (
-                payment_attempt.Status.FAILED
-            )
-            payment_attempt.save(
-                update_fields=[
-                    "status",
-                    "updated_at",
-                ]
-            )
 
-            raise ValidationError(
-                {
-                    "payment": (
-                        "Invalid response received "
-                        "from bKash."
-                    )
-                }
+        except ValueError:
+            BkashPaymentService._raise_payment_error(
+                payment_attempt,
+                "Invalid response received from bKash.",
             )
 
         if not response.ok:
-            payment_attempt.status = (
-                payment_attempt.Status.FAILED
-            )
-            payment_attempt.save(
-                update_fields=[
-                    "status",
-                    "updated_at",
-                ]
+            BkashPaymentService._raise_payment_error(
+                payment_attempt,
+                "bKash payment creation failed.",
             )
 
-            raise ValidationError(
-                {
-                    "payment": (
-                        result.get(
-                            "statusMessage",
-                            "bKash payment creation failed.",
-                        )
-                    )
-                }
+        provider_payment_id = result.get(
+            "paymentID"
+        )
+
+        payment_url = result.get(
+            "bkashURL"
+        )
+
+        if not provider_payment_id:
+            BkashPaymentService._raise_payment_error(
+                payment_attempt,
+                "bKash did not return a payment ID.",
             )
 
-        provider_payment_id = result.get("paymentID")
-        payment_url = result.get("bkashURL")
-
-        if not provider_payment_id or not payment_url:
-            payment_attempt.status = (
-                payment_attempt.Status.FAILED
-            )
-            payment_attempt.save(
-                update_fields=[
-                    "status",
-                    "updated_at",
-                ]
-            )
-
-            raise ValidationError(
-                {
-                    "payment": (
-                        "Invalid payment response "
-                        "received from bKash."
-                    )
-                }
+        if not payment_url:
+            BkashPaymentService._raise_payment_error(
+                payment_attempt,
+                "bKash did not return a payment URL.",
             )
 
         payment_attempt.provider_payment_id = (
             provider_payment_id
         )
+
         payment_attempt.save(
             update_fields=[
                 "provider_payment_id",
