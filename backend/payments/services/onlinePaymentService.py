@@ -101,5 +101,6 @@ class OnlinePaymentService:
             "provider": provider,
             "payment_status": payment.status,
             "payment_url": result["payment_url"],
+            "provider_payment_id": result["provider_payment_id"],
         }
 

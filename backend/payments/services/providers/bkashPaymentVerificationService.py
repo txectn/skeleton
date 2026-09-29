@@ -1,3 +1,5 @@
+import json
+
 import requests
 
 from django.conf import settings
@@ -11,116 +13,23 @@ class BkashPaymentVerificationService:
     TOKEN_CACHE_KEY = "bkash_access_token"
     TOKEN_CACHE_TIMEOUT = 3300
 
-    EXECUTE_PAYMENT_PATH = (
-        "/tokenized/checkout/execute"
+    SEARCH_TRANSACTION_PATH = (
+        "/tokenized/checkout/general/searchTransaction"
     )
-
-    PAYMENT_STATUS_PATH = (
-        "/tokenized/checkout/payment/status"
-    )
-
-    SUCCESS_CALLBACK_STATUS = "success"
-
-    FAILURE_CALLBACK_STATUSES = {
-        "failure",
-        "cancel",
-    }
 
     COMPLETED_TRANSACTION_STATUS = "Completed"
 
+    # ---------------------------------------------------------
+    # URL
+    # ---------------------------------------------------------
+
     @staticmethod
     def _get_url(path):
+
         return (
             f"{settings.BKASH_BASE_URL}"
             f"{path}"
         )
-
-    # ---------------------------------------------------------
-    # Callback Data Validation
-    # ---------------------------------------------------------
-
-    @staticmethod
-    def validate_data(data):
-
-        if not isinstance(data, dict):
-            raise ValidationError(
-                {
-                    "payment": (
-                        "Invalid bKash callback data."
-                    )
-                }
-            )
-
-        payment_id = data.get("paymentID")
-        status = data.get("status")
-
-        if not payment_id:
-            raise ValidationError(
-                {
-                    "payment": (
-                        "bKash payment ID is required."
-                    )
-                }
-            )
-
-        if not isinstance(payment_id, str):
-            raise ValidationError(
-                {
-                    "payment": (
-                        "Invalid bKash payment ID."
-                    )
-                }
-            )
-
-        payment_id = payment_id.strip()
-
-        if not payment_id:
-            raise ValidationError(
-                {
-                    "payment": (
-                        "bKash payment ID is required."
-                    )
-                }
-            )
-
-        if not status:
-            raise ValidationError(
-                {
-                    "payment": (
-                        "bKash payment status is required."
-                    )
-                }
-            )
-
-        if not isinstance(status, str):
-            raise ValidationError(
-                {
-                    "payment": (
-                        "Invalid bKash payment status."
-                    )
-                }
-            )
-
-        status = status.strip().lower()
-
-        allowed_statuses = {
-            BkashPaymentVerificationService.SUCCESS_CALLBACK_STATUS,
-            *BkashPaymentVerificationService.FAILURE_CALLBACK_STATUSES,
-        }
-
-        if status not in allowed_statuses:
-            raise ValidationError(
-                {
-                    "payment": (
-                        "Invalid bKash payment status."
-                    )
-                }
-            )
-
-        return {
-            "payment_id": payment_id,
-            "status": status,
-        }
 
     # ---------------------------------------------------------
     # Identify Provider
@@ -132,7 +41,87 @@ class BkashPaymentVerificationService:
         if not isinstance(data, dict):
             return False
 
-        return bool(data.get("paymentID"))
+        return (
+            data.get("Type") == "Notification"
+            and bool(data.get("Message"))
+        )
+
+    # ---------------------------------------------------------
+    # Webhook Data Validation
+    # ---------------------------------------------------------
+
+    @staticmethod
+    def validate_webhook_data(data):
+
+        if not isinstance(data, dict):
+
+            raise ValidationError(
+                {
+                    "payment": (
+                        "Invalid bKash webhook data."
+                    )
+                }
+            )
+
+        notification_type = data.get("Type")
+
+        if notification_type != "Notification":
+
+            raise ValidationError(
+                {
+                    "payment": (
+                        "Invalid bKash notification type."
+                    )
+                }
+            )
+
+        message = data.get("Message")
+
+        if not message:
+
+            raise ValidationError(
+                {
+                    "payment": (
+                        "bKash webhook message is required."
+                    )
+                }
+            )
+
+        if not isinstance(message, str):
+
+            raise ValidationError(
+                {
+                    "payment": (
+                        "Invalid bKash webhook message."
+                    )
+                }
+            )
+
+        try:
+
+            transaction_data = json.loads(message)
+
+        except (TypeError, ValueError):
+
+            raise ValidationError(
+                {
+                    "payment": (
+                        "Invalid bKash webhook message format."
+                    )
+                }
+            )
+
+        if not isinstance(transaction_data, dict):
+
+            raise ValidationError(
+                {
+                    "payment": (
+                        "Invalid bKash transaction data."
+                    )
+                }
+            )
+
+        return transaction_data
 
     # ---------------------------------------------------------
     # Access Token
@@ -146,6 +135,7 @@ class BkashPaymentVerificationService:
         )
 
         if access_token:
+
             return access_token
 
         url = BkashPaymentVerificationService._get_url(
@@ -165,13 +155,16 @@ class BkashPaymentVerificationService:
         }
 
         try:
+
             response = requests.post(
                 url,
                 headers=headers,
                 json=data,
                 timeout=30,
             )
+
         except requests.RequestException:
+
             raise ValidationError(
                 {
                     "payment": (
@@ -181,8 +174,11 @@ class BkashPaymentVerificationService:
             )
 
         try:
+
             result = response.json()
+
         except ValueError:
+
             raise ValidationError(
                 {
                     "payment": (
@@ -193,6 +189,7 @@ class BkashPaymentVerificationService:
             )
 
         if not response.ok:
+
             raise ValidationError(
                 {
                     "payment": (
@@ -204,6 +201,7 @@ class BkashPaymentVerificationService:
         access_token = result.get("id_token")
 
         if not access_token:
+
             raise ValidationError(
                 {
                     "payment": (
@@ -218,18 +216,24 @@ class BkashPaymentVerificationService:
         )
 
         try:
+
             expires_in = int(expires_in)
+
         except (TypeError, ValueError):
+
             expires_in = (
-                BkashPaymentVerificationService.TOKEN_CACHE_TIMEOUT
+                BkashPaymentVerificationService
+                .TOKEN_CACHE_TIMEOUT
             )
 
         cache_timeout = min(
             expires_in - 60,
-            BkashPaymentVerificationService.TOKEN_CACHE_TIMEOUT,
+            BkashPaymentVerificationService
+            .TOKEN_CACHE_TIMEOUT,
         )
 
         if cache_timeout <= 0:
+
             cache_timeout = 60
 
         cache.set(
@@ -245,9 +249,12 @@ class BkashPaymentVerificationService:
     # ---------------------------------------------------------
 
     @staticmethod
-    def get_payment_attempt(payment_id):
+    def get_payment_attempt(
+        merchant_invoice_number,
+    ):
 
         try:
+
             return (
                 PaymentAttempt.objects
                 .select_related(
@@ -255,10 +262,12 @@ class BkashPaymentVerificationService:
                 )
                 .get(
                     provider="bkash",
-                    provider_payment_id=payment_id,
+                    payment__order__id=merchant_invoice_number,
                 )
             )
+
         except PaymentAttempt.DoesNotExist:
+
             raise ValidationError(
                 {
                     "payment": (
@@ -268,11 +277,11 @@ class BkashPaymentVerificationService:
             )
 
     # ---------------------------------------------------------
-    # Execute Payment
+    # Search Transaction
     # ---------------------------------------------------------
 
     @staticmethod
-    def execute_payment(payment_id):
+    def search_transaction(transaction_id):
 
         access_token = (
             BkashPaymentVerificationService
@@ -280,7 +289,8 @@ class BkashPaymentVerificationService:
         )
 
         url = BkashPaymentVerificationService._get_url(
-            BkashPaymentVerificationService.EXECUTE_PAYMENT_PATH,
+            BkashPaymentVerificationService
+            .SEARCH_TRANSACTION_PATH,
         )
 
         headers = {
@@ -291,43 +301,50 @@ class BkashPaymentVerificationService:
         }
 
         data = {
-            "paymentID": payment_id,
+            "trxID": transaction_id,
         }
 
         try:
+
             response = requests.post(
                 url,
                 headers=headers,
                 json=data,
                 timeout=30,
             )
+
         except requests.RequestException:
+
             raise ValidationError(
                 {
                     "payment": (
                         "Unable to connect to bKash "
-                        "for payment verification."
+                        "for transaction verification."
                     )
                 }
             )
 
         try:
+
             result = response.json()
+
         except ValueError:
+
             raise ValidationError(
                 {
                     "payment": (
-                        "Invalid payment verification "
+                        "Invalid transaction verification "
                         "response received from bKash."
                     )
                 }
             )
 
         if not response.ok:
+
             raise ValidationError(
                 {
                     "payment": (
-                        "bKash payment execution failed."
+                        "Unable to verify the bKash transaction."
                     )
                 }
             )
@@ -335,108 +352,184 @@ class BkashPaymentVerificationService:
         return result
 
     # ---------------------------------------------------------
-    # Verify
+    # Verify Webhook
     # ---------------------------------------------------------
 
     @staticmethod
-    def verify(data):
+    def verify_webhook(data):
 
-        validated_data = (
+        transaction_data = (
             BkashPaymentVerificationService
-            .validate_data(data)
+            .validate_webhook_data(data)
         )
 
-        payment_id = validated_data["payment_id"]
-        callback_status = validated_data["status"]
+        transaction_status = transaction_data.get(
+            "transactionStatus"
+        )
+
+        transaction_id = transaction_data.get(
+            "trxID"
+        )
+
+        merchant_invoice_number = transaction_data.get(
+            "merchantInvoiceNumber"
+        )
+
+        amount = transaction_data.get(
+            "amount"
+        )
+
+        currency = transaction_data.get(
+            "currency"
+        )
+
+        # -----------------------------------------------------
+        # Required Fields
+        # -----------------------------------------------------
+
+        if not transaction_id:
+
+            raise ValidationError(
+                {
+                    "payment": (
+                        "bKash transaction ID is required."
+                    )
+                }
+            )
+
+        if not merchant_invoice_number:
+
+            raise ValidationError(
+                {
+                    "payment": (
+                        "bKash merchant invoice number "
+                        "is required."
+                    )
+                }
+            )
+
+        if amount is None:
+
+            raise ValidationError(
+                {
+                    "payment": (
+                        "bKash transaction amount is required."
+                    )
+                }
+            )
+
+        if not currency:
+
+            raise ValidationError(
+                {
+                    "payment": (
+                        "bKash transaction currency is required."
+                    )
+                }
+            )
+
+        # -----------------------------------------------------
+        # Find Local Payment Attempt
+        # -----------------------------------------------------
 
         payment_attempt = (
             BkashPaymentVerificationService
-            .get_payment_attempt(payment_id)
+            .get_payment_attempt(
+                merchant_invoice_number,
+            )
         )
+
+        payment = payment_attempt.payment
+        order = payment.order
 
         # -----------------------------------------------------
         # Already Paid
         # -----------------------------------------------------
 
-        if (
-            payment_attempt.payment.status
-            == payment_attempt.payment.Status.PAID
-        ):
+        if payment.status == payment.Status.PAID:
+
             return {
                 "success": True,
                 "payment_attempt": payment_attempt,
                 "transaction_id": (
                     payment_attempt.transaction_id
+                    or transaction_id
                 ),
             }
 
         # -----------------------------------------------------
-        # Customer Failed / Cancelled
+        # Verify Transaction With bKash
         # -----------------------------------------------------
 
-        if callback_status in (
+        verified_transaction = (
             BkashPaymentVerificationService
-            .FAILURE_CALLBACK_STATUSES
-        ):
-            return {
-                "success": False,
-                "payment_attempt": payment_attempt,
-                "transaction_id": None,
-            }
+            .search_transaction(
+                transaction_id,
+            )
+        )
 
-        # -----------------------------------------------------
-        # Success Callback
-        # -----------------------------------------------------
+        verified_transaction_id = (
+            verified_transaction.get("trxID")
+        )
 
-        result = (
-            BkashPaymentVerificationService
-            .execute_payment(payment_id)
+        verified_status = (
+            verified_transaction.get("transactionStatus")
+        )
+
+        verified_amount = (
+            verified_transaction.get("amount")
+        )
+
+        verified_currency = (
+            verified_transaction.get("currency")
+        )
+
+        verified_invoice = (
+            verified_transaction.get(
+                "merchantInvoiceNumber"
+            )
         )
 
         # -----------------------------------------------------
-        # Validate Provider Response
+        # Verify Transaction ID
         # -----------------------------------------------------
 
-        response_payment_id = result.get(
-            "paymentID"
-        )
+        if verified_transaction_id != transaction_id:
 
-        if response_payment_id != payment_id:
             raise ValidationError(
                 {
                     "payment": (
-                        "bKash returned an invalid "
-                        "payment ID."
+                        "bKash transaction ID does not "
+                        "match the verified transaction."
                     )
                 }
             )
 
-        status_code = result.get(
-            "statusCode"
-        )
+        # -----------------------------------------------------
+        # Verify Merchant Invoice
+        # -----------------------------------------------------
 
-        if status_code != "0000":
-            return {
-                "success": False,
-                "payment_attempt": payment_attempt,
-                "transaction_id": result.get(
-                    "trxID"
-                ),
-            }
+        if verified_invoice != merchant_invoice_number:
 
-        transaction_status = result.get(
-            "transactionStatus"
-        )
+            raise ValidationError(
+                {
+                    "payment": (
+                        "bKash merchant invoice number does "
+                        "not match the verified transaction."
+                    )
+                }
+            )
 
-        transaction_id = result.get(
-            "trxID"
-        )
+        # -----------------------------------------------------
+        # Verify Transaction Status
+        # -----------------------------------------------------
 
         if (
-            transaction_status
+            verified_status
             != BkashPaymentVerificationService
             .COMPLETED_TRANSACTION_STATUS
         ):
+
             return {
                 "success": False,
                 "payment_attempt": payment_attempt,
@@ -444,24 +537,11 @@ class BkashPaymentVerificationService:
             }
 
         # -----------------------------------------------------
-        # Validate Payment Amount
+        # Verify Amount
         # -----------------------------------------------------
 
-        provider_amount = result.get("amount")
+        if str(verified_amount) != str(order.total):
 
-        if provider_amount is None:
-            raise ValidationError(
-                {
-                    "payment": (
-                        "bKash verification response "
-                        "does not contain an amount."
-                    )
-                }
-            )
-
-        if str(provider_amount) != str(
-            payment_attempt.payment.order.total
-        ):
             raise ValidationError(
                 {
                     "payment": (
@@ -472,19 +552,54 @@ class BkashPaymentVerificationService:
             )
 
         # -----------------------------------------------------
-        # Validate Currency
+        # Verify Currency
         # -----------------------------------------------------
 
-        provider_currency = result.get(
-            "currency"
-        )
+        if verified_currency != "BDT":
 
-        if provider_currency != "BDT":
             raise ValidationError(
                 {
                     "payment": (
                         "bKash payment currency does "
                         "not match the order currency."
+                    )
+                }
+            )
+
+        # -----------------------------------------------------
+        # Verify Webhook Against bKash Response
+        # -----------------------------------------------------
+
+        if str(amount) != str(verified_amount):
+
+            raise ValidationError(
+                {
+                    "payment": (
+                        "bKash webhook amount does not "
+                        "match the verified transaction."
+                    )
+                }
+            )
+
+        if currency != verified_currency:
+
+            raise ValidationError(
+                {
+                    "payment": (
+                        "bKash webhook currency does not "
+                        "match the verified transaction."
+                    )
+                }
+            )
+
+        if transaction_status != verified_status:
+
+            raise ValidationError(
+                {
+                    "payment": (
+                        "bKash webhook transaction status "
+                        "does not match the verified "
+                        "transaction."
                     )
                 }
             )

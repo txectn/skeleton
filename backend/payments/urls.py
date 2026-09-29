@@ -6,6 +6,6 @@ from .views import (
 )
 
 urlpatterns = [
-    path("payment/", PaymentView.as_view(), name="payment"),
+    path("checkout/payment/", PaymentView.as_view(), name="checkout-payment"),
     path("payment/webhook/", PaymentWebhookView.as_view(), name="payment-webhook"),
 ]

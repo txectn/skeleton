@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>unlisted+ — every episode. one membership.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0a0b; --panel:#141416; --panel2:#1b1b1e; --line:#232327; --line2:#333338;
+  --ink:#f4f4f1; --muted:#9b9ba2; --dim:#6c6c73;
+  --red:#ff2e3f; --red-d:#e0172b;
+  --font:'Sora',sans-serif; --mono:'JetBrains Mono',monospace;
+  --r:12px; --pad:clamp(16px,4vw,48px); --max:1300px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:76px}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+::selection{background:var(--red);color:#fff}
+::-webkit-scrollbar{width:10px;height:8px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:#2b2b30;border-radius:5px}
+img{display:block}
+button{font-family:inherit;cursor:pointer}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--red);outline-offset:2px;border-radius:4px}
+.mono{font-family:var(--mono)}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 var(--pad)}
+
+/* ============ buttons ============ */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;font-family:var(--font);font-weight:700;font-size:14px;padding:13px 24px;border-radius:10px;border:1px solid transparent;transition:transform .15s,background .2s,border-color .2s,color .2s;text-decoration:none;white-space:nowrap}
+.btn:active{transform:scale(.97)}
+.btn svg{width:16px;height:16px}
+.btn-red{background:var(--red);color:#fff}
+.btn-red:hover{background:var(--red-d)}
+.btn-white{background:#fff;color:#000}
+.btn-white:hover{background:#e6e6e6}
+.btn-ghost{border-color:var(--line2);color:var(--ink);background:transparent}
+.btn-ghost:hover{border-color:var(--dim)}
+.btn-sm{padding:9px 16px;font-size:13px;border-radius:8px}
+.btn-lg{padding:16px 30px;font-size:15px}
+
+/* ============ header ============ */
+header{position:fixed;top:0;left:0;right:0;z-index:60;height:64px;display:flex;align-items:center;transition:background .3s,border-color .3s;border-bottom:1px solid transparent}
+header.scrolled{background:rgba(10,10,11,.92);backdrop-filter:blur(12px);border-color:var(--line)}
+.hd{width:100%;max-width:var(--max);margin:0 auto;padding:0 var(--pad);display:flex;align-items:center;gap:28px}
+.logo{font-weight:800;font-size:23px;letter-spacing:-.03em;text-decoration:none;display:flex;align-items:center}
+.logo b{color:var(--red);font-weight:800}
+.nav{display:flex;gap:6px;flex:1}
+.nav a{font-size:14px;font-weight:600;color:var(--muted);text-decoration:none;padding:8px 13px;border-radius:8px;transition:.2s}
+.nav a:hover{color:var(--ink);background:var(--panel)}
+.hd-right{display:flex;align-items:center;gap:10px}
+.searchbox{display:flex;align-items:center;gap:8px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px 12px;width:220px;transition:width .25s,border-color .2s}
+.searchbox:focus-within{width:290px;border-color:var(--dim)}
+.searchbox svg{width:15px;height:15px;color:var(--dim);flex:none}
+.searchbox input{background:none;border:0;outline:0;color:var(--ink);font-family:var(--font);font-size:13.5px;width:100%}
+.searchbox input::placeholder{color:var(--dim)}
+.iconbtn{background:none;border:1px solid var(--line);color:var(--muted);width:38px;height:38px;border-radius:10px;display:none;place-items:center;transition:.2s}
+.iconbtn:hover{color:var(--ink);border-color:var(--dim)}
+.iconbtn svg{width:17px;height:17px}
+.avatar{width:36px;height:36px;border-radius:50%;background:var(--red);color:#fff;display:grid;place-items:center;font-weight:800;font-size:15px;border:0;position:relative}
+.umenu{position:absolute;top:calc(100% + 10px);right:0;background:#141416;border:1px solid var(--line);border-radius:12px;min-width:200px;overflow:hidden;box-shadow:0 18px 40px rgba(0,0,0,.5);display:none;text-align:left}
+.umenu.open{display:block}
+.umenu button{display:flex;align-items:center;gap:10px;width:100%;padding:12px 15px;background:none;border:0;color:var(--muted);font-size:13.5px;font-weight:600}
+.umenu button:hover{background:var(--panel2);color:var(--ink)}
+.umenu svg{width:15px;height:15px}
+/* mobile search bar */
+.msearch{display:none;background:rgba(10,10,11,.97);border-bottom:1px solid var(--line);padding:12px var(--pad)}
+.msearch.open{display:block}
+/* drawer */
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:70;opacity:0;pointer-events:none;transition:opacity .3s}
+.scrim.open{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(320px,85vw);background:#101012;border-left:1px solid var(--line);z-index:75;padding:24px;transform:translateX(103%);transition:transform .35s cubic-bezier(.7,0,.2,1);display:flex;flex-direction:column;gap:6px}
+.drawer.open{transform:none}
+.drawer a{font-size:20px;font-weight:700;color:var(--ink);text-decoration:none;padding:14px 0;border-bottom:1px solid var(--line)}
+.drawer .btn{margin-top:16px}
+
+/* ============ hero ============ */
+.hero{position:relative;height:min(86vh,780px);min-height:540px;margin-top:64px;overflow:hidden}
+.slide{position:absolute;inset:0;opacity:0;transition:opacity .9s ease;pointer-events:none}
+.slide.on{opacity:1;pointer-events:auto}
+.slide img{width:100%;height:100%;object-fit:cover}
+.slide::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,10,11,.35) 0%,rgba(10,10,11,0) 32%,rgba(10,10,11,.55) 62%,var(--bg) 98%)}
+.hero-inner{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;justify-content:flex-end;padding:0 var(--pad) 64px;max-width:var(--max);margin:0 auto;left:0;right:0}
+.htext{max-width:640px}
+.htext.anim{animation:heroIn .7s cubic-bezier(.2,.8,.2,1) both}
+@keyframes heroIn{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+.h-badges{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.tag{font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.08em;padding:6px 11px;border-radius:6px}
+.tag-red{background:var(--red);color:#fff}
+.tag-dark{background:rgba(0,0,0,.65);color:#fff;backdrop-filter:blur(4px)}
+.hero h1{font-size:clamp(38px,6.6vw,84px);font-weight:800;letter-spacing:-.025em;line-height:.98;text-transform:uppercase;margin-bottom:14px}
+.hero p{color:#c9c9c4;font-size:clamp(14px,1.4vw,16.5px);line-height:1.6;max-width:540px;margin-bottom:26px}
+.h-meta{display:flex;gap:14px;align-items:center;font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:26px;flex-wrap:wrap}
+.h-meta i{width:4px;height:4px;border-radius:50%;background:var(--dim)}
+.h-btns{display:flex;gap:12px;flex-wrap:wrap}
+.dots{position:absolute;right:var(--pad);bottom:64px;z-index:3;display:flex;gap:8px}
+.dots button{width:26px;height:4px;border-radius:2px;background:#3a3a40;border:0;padding:0;transition:.25s}
+.dots button.on{background:var(--red);width:40px}
+
+/* ============ live band ============ */
+.liveband{background:#151011;border-top:1px solid #2c1b1d;border-bottom:1px solid #2c1b1d}
+.live-in{max-width:var(--max);margin:0 auto;padding:16px var(--pad);display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.livepill{display:flex;align-items:center;gap:9px;font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.1em;color:var(--red)}
+.livepill .dot{width:9px;height:9px;border-radius:50%;background:var(--red);animation:pulse 1.3s infinite}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(255,46,63,.5)}50%{opacity:.55;box-shadow:0 0 0 7px rgba(255,46,63,0)}}
+.liveband h3{font-size:16px;font-weight:700;letter-spacing:-.01em}
+.liveband .viewers{font-family:var(--mono);font-size:11px;color:var(--muted)}
+.liveband .spacer{flex:1}
+.cd{font-family:var(--mono);font-size:11px;color:var(--muted);display:flex;align-items:center;gap:10px}
+.cd b{color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums}
+
+/* ============ sections ============ */
+section{padding:56px 0 8px}
+.shead{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin-bottom:22px}
+.shead h2{font-size:clamp(22px,3vw,34px);font-weight:800;letter-spacing:-.02em}
+.shead .note{font-family:var(--mono);font-size:10.5px;color:var(--dim);letter-spacing:.06em;text-align:right;line-height:1.8}
+
+/* chips */
+.chips{display:flex;gap:9px;overflow-x:auto;padding-bottom:6px;margin-bottom:22px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{padding:9px 18px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--muted);font-weight:600;font-size:13.5px;white-space:nowrap;transition:.2s}
+.chip:hover{border-color:var(--dim);color:var(--ink)}
+.chip.on{background:var(--ink);color:#000;border-color:var(--ink)}
+
+/* ============ card grid ============ */
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:18px}
+.card{grid-column:span 3;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;cursor:pointer;transition:transform .25s,border-color .25s;animation:cardIn .5s cubic-bezier(.2,.8,.2,1) both}
+.card:hover{transform:translateY(-4px);border-color:var(--line2)}
+@keyframes cardIn{from{opacity:0;transform:translateY(16px)}to{opacity:1}}
+.card.feat{grid-column:span 6}
+.thumb{position:relative;aspect-ratio:16/9;overflow:hidden;background:#000}
+.thumb img{width:100%;height:100%;object-fit:cover;transition:transform .5s cubic-bezier(.2,.8,.2,1)}
+.card:hover .thumb img{transform:scale(1.06)}
+.b-new{position:absolute;top:10px;left:10px}
+.b-lock{position:absolute;top:10px;right:10px;display:flex;align-items:center;gap:5px;background:rgba(0,0,0,.72);backdrop-filter:blur(4px);color:#fff;font-family:var(--mono);font-size:9.5px;font-weight:600;letter-spacing:.08em;padding:5px 9px;border-radius:6px}
+.b-lock svg{width:11px;height:11px}
+.b-dur{position:absolute;bottom:10px;right:10px;background:rgba(0,0,0,.78);color:#fff;font-family:var(--mono);font-size:11px;padding:4px 8px;border-radius:5px}
+.b-play{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) scale(.7);width:54px;height:54px;border-radius:50%;background:#fff;color:#000;border:0;display:grid;place-items:center;opacity:0;transition:.25s}
+.b-play svg{width:20px;height:20px;margin-left:2px}
+.card:hover .b-play{opacity:1;transform:translate(-50%,-50%) scale(1)}
+.cbody{padding:13px 15px 15px}
+.cbody h3{font-size:15px;font-weight:700;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cbody .cmeta{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:6px}
+.card.feat .cbody h3{font-size:20px;white-space:normal}
+.card.feat .cdesc{font-size:13.5px;color:var(--muted);margin-top:8px;line-height:1.55;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+/* progress under thumb (continue row) */
+.cprog{height:3px;background:#2a2a2f;position:relative}
+.cprog i{position:absolute;left:0;top:0;bottom:0;background:var(--red);border-radius:0 2px 2px 0}
+
+/* empty state */
+.empty{grid-column:1/-1;text-align:center;padding:80px 20px;color:var(--muted)}
+.empty svg{width:38px;height:38px;color:var(--dim);margin:0 auto 16px}
+.empty p{margin-bottom:18px;font-size:14.5px}
+
+/* ============ rails ============ */
+.rail{display:flex;gap:16px;overflow-x:auto;padding:4px 4px 18px;scroll-snap-type:x mandatory;scrollbar-width:thin}
+.rank{flex:none;display:flex;align-items:center;gap:8px;scroll-snap-align:start;cursor:pointer}
+.rnum{font-size:104px;font-weight:800;line-height:.78;color:transparent;-webkit-text-stroke:2.5px #34343a;transition:.25s;user-select:none;letter-spacing:-.05em}
+.rank:hover .rnum{-webkit-text-stroke-color:var(--red)}
+.rthumb{width:150px;position:relative;border-radius:10px;overflow:hidden;aspect-ratio:16/9;background:#000;border:1px solid var(--line);transition:border-color .25s}
+.rank:hover .rthumb{border-color:var(--red)}
+.rthumb img{width:100%;height:100%;object-fit:cover;transition:transform .5s}
+.rank:hover .rthumb img{transform:scale(1.07)}
+.rthumb .b-dur{bottom:8px;right:8px}
+.cwatch{flex:none;width:264px;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;cursor:pointer;transition:transform .25s,border-color .25s;scroll-snap-align:start}
+.cwatch:hover{transform:translateY(-4px);border-color:var(--line2)}
+
+/* ============ subscribe ============ */
+.sub{background:#0d0d0f;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:72px 0}
+.sub-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:64px;align-items:center}
+.sub h2{font-size:clamp(30px,4.2vw,52px);font-weight:800;letter-spacing:-.025em;line-height:1.02;text-transform:uppercase;margin-bottom:16px}
+.sub h2 b{color:var(--red)}
+.sub .lead{color:var(--muted);font-size:16px;line-height:1.65;max-width:480px;margin-bottom:30px}
+.feats{display:flex;flex-direction:column;gap:0}
+.feats li{display:flex;gap:14px;align-items:center;padding:15px 0;border-bottom:1px solid var(--line);list-style:none;font-size:15px}
+.feats li:first-child{border-top:1px solid var(--line)}
+.feats li b{font-weight:700}
+.feats li span{color:var(--muted)}
+.feats svg{width:19px;height:19px;color:var(--red);flex:none}
+/* price card */
+.pricecard{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:30px}
+.seg{display:flex;background:#0e0e10;border-radius:999px;padding:4px;margin-bottom:26px}
+.seg button{flex:1;padding:10px;border-radius:999px;border:0;background:none;color:var(--muted);font-weight:700;font-size:13.5px;transition:.2s;display:flex;justify-content:center;align-items:center;gap:8px}
+.seg button.on{background:var(--ink);color:#000}
+.seg .save{font-family:var(--mono);font-size:9.5px;font-weight:600;color:var(--red);background:rgba(255,46,63,.12);padding:3px 7px;border-radius:99px}
+.seg button.on .save{color:#b3001a;background:rgba(0,0,0,.12)}
+.pricerow{display:flex;align-items:baseline;gap:10px;margin-bottom:4px}
+.pricerow b{font-size:56px;font-weight:800;letter-spacing:-.03em}
+.pricerow span{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.price-equiv{font-family:var(--mono);font-size:11px;color:var(--dim);margin-bottom:24px;min-height:16px}
+.pricecard .btn{width:100%;margin-bottom:16px}
+.pnote{text-align:center;font-family:var(--mono);font-size:10.5px;color:var(--muted);letter-spacing:.04em;line-height:1.9}
+.pnote b{color:var(--ink)}
+
+/* ============ faq ============ */
+.faqrow{border-bottom:1px solid var(--line)}
+.faqrow:first-child{border-top:1px solid var(--line)}
+.faq-q{width:100%;display:flex;align-items:center;gap:18px;padding:22px 4px;background:none;border:0;color:var(--ink);text-align:left;font-size:16.5px;font-weight:700;font-family:var(--font)}
+.faq-q .n{font-family:var(--mono);font-size:11px;color:var(--dim)}
+.faq-q svg{width:18px;height:18px;color:var(--muted);margin-left:auto;transition:transform .3s;flex:none}
+.faqrow.open .faq-q svg{transform:rotate(45deg);color:var(--red)}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .4s cubic-bezier(.65,0,.35,1)}
+.faq-a p{padding:0 4px 24px 42px;color:var(--muted);font-size:15px;line-height:1.7;max-width:680px}
+
+/* ============ footer ============ */
+footer{padding:64px 0 0}
+.f-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:44px;padding-bottom:56px}
+.f-grid h5{font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.12em;color:var(--dim);margin-bottom:16px;text-transform:uppercase}
+.f-grid a{display:block;color:var(--muted);text-decoration:none;font-size:14px;padding:5px 0;width:max-content;transition:color .2s}
+.f-grid a:hover{color:var(--ink)}
+.f-blurb{color:var(--muted);font-size:14px;line-height:1.65;max-width:300px;margin:16px 0 22px}
+.socials{display:flex;gap:9px}
+.socials a{width:40px;height:40px;border:1px solid var(--line);border-radius:10px;display:grid;place-items:center;color:var(--muted);transition:.2s;padding:0}
+.socials a:hover{color:#fff;background:var(--red);border-color:var(--red)}
+.socials svg{width:17px;height:17px}
+.f-bottom{border-top:1px solid var(--line);padding:20px 0;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;font-family:var(--mono);font-size:10.5px;color:var(--dim);letter-spacing:.05em}
+.f-bottom .right{display:flex;gap:16px;align-items:center}
+.f-bottom .box{border:1px solid var(--line);border-radius:5px;padding:3px 8px;color:var(--muted)}
+
+/* ============ modals ============ */
+.modal{position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;background:rgba(5,5,6,.78);backdrop-filter:blur(6px);padding:16px}
+.modal.open{display:flex}
+@keyframes pop{from{opacity:0;transform:translateY(18px) scale(.98)}to{opacity:1;transform:none}}
+/* auth */
+.auth{width:min(430px,100%);background:#111113;border:1px solid var(--line);border-radius:18px;overflow:hidden;animation:pop .35s cubic-bezier(.2,.9,.3,1.1)}
+.auth-tabs{display:flex;border-bottom:1px solid var(--line)}
+.auth-tabs button{flex:1;padding:17px;background:none;border:0;color:var(--dim);font-weight:700;font-size:14px;font-family:var(--font);position:relative;transition:color .2s}
+.auth-tabs button+button{border-left:1px solid var(--line)}
+.auth-tabs button.on{color:var(--ink)}
+.auth-tabs button.on::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--red)}
+.auth-body{padding:28px}
+.plan-chip{display:flex;align-items:center;gap:9px;font-family:var(--mono);font-size:11px;color:var(--red);border:1px solid rgba(255,46,63,.35);background:rgba(255,46,63,.07);padding:10px 13px;border-radius:9px;margin-bottom:22px}
+.plan-chip svg{width:14px;height:14px}
+.field{display:block;margin-bottom:18px}
+.field span{display:block;font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.1em;color:var(--dim);margin-bottom:8px;text-transform:uppercase}
+.field input{width:100%;background:var(--panel);border:1px solid var(--line);border-radius:10px;color:var(--ink);font-family:var(--font);font-size:15px;padding:12px 14px;transition:border-color .2s}
+.field input:focus{outline:0;border-color:var(--dim)}
+.ferr{font-size:12.5px;color:var(--red);margin:-4px 0 16px;line-height:1.6;font-family:var(--mono)}
+.auth .btn{width:100%}
+.fine{text-align:center;font-family:var(--mono);font-size:9.5px;color:var(--dim);letter-spacing:.08em;margin-top:16px;line-height:1.8}
+/* player */
+.player{width:min(900px,100%);background:#101012;border:1px solid var(--line);border-radius:18px;overflow:hidden;animation:pop .35s cubic-bezier(.2,.9,.3,1.1)}
+.pl-head{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 20px}
+.pl-head .l{display:flex;align-items:center;gap:13px;min-width:0}
+.pl-badge{font-family:var(--mono);font-size:9.5px;font-weight:600;letter-spacing:.08em;padding:5px 9px;border-radius:6px;background:rgba(255,46,63,.14);color:var(--red);white-space:nowrap}
+.pl-badge.full{background:var(--panel2);color:var(--ink)}
+.pl-tt h4{font-size:17px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pl-tt p{font-family:var(--mono);font-size:10.5px;color:var(--muted);margin-top:3px}
+.pl-close{background:var(--panel);border:1px solid var(--line);color:var(--muted);width:36px;height:36px;border-radius:9px;display:grid;place-items:center;flex:none;transition:.2s}
+.pl-close:hover{color:var(--ink);border-color:var(--dim)}
+.pl-close svg{width:16px;height:16px}
+.pl-screen{position:relative;background:#000;cursor:pointer}
+.pl-screen img{width:100%;aspect-ratio:16/9;object-fit:cover}
+.pl-live{position:absolute;top:14px;left:14px;display:flex;align-items:center;gap:7px;background:var(--red);color:#fff;font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.1em;padding:6px 11px;border-radius:6px}
+.pl-live .dot{width:7px;height:7px;border-radius:50%;background:#fff;animation:pulse2 1.3s infinite}
+@keyframes pulse2{0%,100%{opacity:1}50%{opacity:.3}}
+.pl-bigplay{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:72px;height:72px;border-radius:50%;background:#fff;color:#000;border:0;display:grid;place-items:center;opacity:0;transition:.2s}
+.pl-bigplay svg{width:26px;height:26px;margin-left:3px}
+.pl-screen.paused .pl-bigplay{opacity:1}
+.pl-end{position:absolute;inset:0;background:rgba(8,8,9,.94);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center;padding:24px;z-index:3}
+.pl-end .mono{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.14em;color:var(--red)}
+.pl-end h4{font-size:clamp(22px,3.6vw,34px);font-weight:800;letter-spacing:-.02em;text-transform:uppercase;margin-bottom:12px}
+.pl-end .h-btns{margin-bottom:6px}
+.pl-bar{display:flex;align-items:center;gap:15px;padding:14px 20px;border-top:1px solid var(--line)}
+.pl-toggle{background:var(--panel);border:1px solid var(--line);color:var(--ink);width:38px;height:38px;border-radius:50%;display:grid;place-items:center;flex:none;transition:.2s}
+.pl-toggle:hover{border-color:var(--dim)}
+.pl-toggle svg{width:16px;height:16px}
+.pl-track{flex:1;height:22px;position:relative;cursor:pointer}
+.pl-track::before{content:"";position:absolute;left:0;right:0;top:10px;height:4px;border-radius:2px;background:#26262b}
+.pl-fill{position:absolute;left:0;top:10px;height:4px;border-radius:2px;background:var(--red);width:0}
+.pl-fill.scan{width:22%;animation:scan 1.6s linear infinite}
+@keyframes scan{from{left:-22%}to{left:100%}}
+.pl-time{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
+
+/* toast */
+#toasts{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:200;display:flex;flex-direction:column;gap:9px;align-items:center}
+.toast{display:flex;align-items:center;gap:11px;background:#fff;color:#000;font-weight:600;font-size:13.5px;padding:13px 19px;border-radius:11px;animation:tin .3s cubic-bezier(.2,.9,.3,1.1);box-shadow:0 10px 30px rgba(0,0,0,.4);max-width:calc(100vw - 32px)}
+.toast svg{width:16px;height:16px;color:var(--red);flex:none}
+.toast.out{opacity:0;transform:translateY(8px);transition:.3s}
+@keyframes tin{from{opacity:0;transform:translateY(12px)}to{opacity:1}}
+
+/* reveal */
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .6s,transform .6s cubic-bezier(.2,.8,.2,1)}
+.reveal.in{opacity:1;transform:none}
+
+/* ============ responsive ============ */
+@media(max-width:1180px){
+  .card{grid-column:span 6}.card.feat{grid-column:span 12}
+  .sub-grid{grid-template-columns:1fr;gap:44px}
+}
+@media(max-width:920px){
+  .nav,.searchbox{display:none}
+  .iconbtn{display:grid}
+  .hd-right .btn-ghost{display:none}
+  .f-grid{grid-template-columns:1fr 1fr}
+  .dots{display:none}
+}
+@media(max-width:620px){
+  .card,.card.feat{grid-column:span 6}
+  .card.feat .cbody h3{font-size:15px}
+  .card.feat .cdesc{display:none}
+  .rnum{font-size:72px}
+  .rthumb{width:126px}
+  .hero{min-height:480px}
+  .cd{display:none}
+  .f-grid{grid-template-columns:1fr;gap:32px}
+}
+@media(prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+  .reveal{opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+
+<header id="hd">
+  <div class="hd">
+    <a class="logo" href="#top">unlisted<b>+</b></a>
+    <nav class="nav">
+      <a href="#drops">Latest drops</a>
+      <a href="#top10">Top 10</a>
+      <a href="#membership">Membership</a>
+      <a href="#faq">Help</a>
+    </nav>
+    <div class="hd-right" id="hdRight">
+      <div class="searchbox">
+        <i data-lucide="search"></i>
+        <input id="searchInput" type="text" placeholder="Search drops…" aria-label="Search">
+      </div>
+      <button class="iconbtn" id="mSearchBtn" aria-label="Search"><i data-lucide="search"></i></button>
+      <button class="iconbtn" id="burger" aria-label="Menu" style="display:grid"><i data-lucide="menu"></i></button>
+    </div>
+  </div>
+</header>
+
+<div class="msearch" id="mSearch">
+  <div class="searchbox" style="display:flex;width:100%">
+    <i data-lucide="search"></i>
+    <input id="searchInputM" type="text" placeholder="Search drops…" aria-label="Search">
+  </div>
+</div>
+
+<div class="scrim" id="scrim"></div>
+<div class="drawer" id="drawer">
+  <a href="#drops" class="dlink">Latest drops</a>
+  <a href="#top10" class="dlink">Top 10</a>
+  <a href="#membership" class="dlink">Membership</a>
+  <a href="#faq" class="dlink">Help</a>
+  <div id="drawerAuth"></div>
+</div>
+
+<main id="top">
+
+  <!-- HERO -->
+  <div class="hero" id="hero">
+    <div class="slide on"><img src="https://picsum.photos/seed/unlfinale/1920/1080.jpg" alt=""></div>
+    <div class="slide"><img src="https://picsum.photos/seed/unlnowhere/1920/1080.jpg" alt=""></div>
+    <div class="slide"><img src="https://picsum.photos/seed/unlchat/1920/1080.jpg" alt=""></div>
+    <div class="hero-inner">
+      <div class="htext anim" id="heroText"></div>
+    </div>
+    <div class="dots" id="heroDots"></div>
+  </div>
+
+  <!-- LIVE BAND -->
+  <div class="liveband">
+    <div class="live-in">
+      <span class="livepill"><span class="dot"></span>LIVE NOW</span>
+      <div>
+        <h3>Group Chat — live from the studio</h3>
+        <span class="viewers"><span id="liveViewers">12,481</span> members watching</span>
+      </div>
+      <div class="spacer"></div>
+      <span class="cd">NEXT DROP — FRIDAY 18:00 · <b id="cdText">00:00:00:00</b></span>
+      <button class="btn btn-red btn-sm" id="joinLive"><i data-lucide="radio"></i>Join live</button>
+    </div>
+  </div>
+
+  <div class="wrap">
+
+    <!-- CONTINUE WATCHING -->
+    <section id="continueSec" style="display:none">
+      <div class="shead">
+        <h2>Continue watching</h2>
+        <span class="note">PICK UP WHERE<br>YOU LEFT OFF</span>
+      </div>
+      <div class="rail" id="continueRail"></div>
+    </section>
+
+    <!-- LATEST DROPS -->
+    <section id="drops">
+      <div class="shead">
+        <h2>Latest drops</h2>
+        <span class="note" id="gridNote">14 DROPS · UPDATED WEEKLY</span>
+      </div>
+      <div class="chips" id="chips">
+        <button class="chip on" data-cat="all">All</button>
+        <button class="chip" data-cat="challenges">Challenges</button>
+        <button class="chip" data-cat="series">Series</button>
+        <button class="chip" data-cat="documentary">Documentaries</button>
+        <button class="chip" data-cat="podcast">Podcasts</button>
+        <button class="chip" data-cat="travel">Travel</button>
+      </div>
+      <div class="grid" id="grid"></div>
+    </section>
+
+    <!-- TOP 10 -->
+    <section id="top10">
+      <div class="shead">
+        <h2>Top 10 this week</h2>
+        <span class="note">WHAT MEMBERS ARE<br>BINGING RIGHT NOW</span>
+      </div>
+      <div class="rail" id="topRail"></div>
+    </section>
+  </div>
+
+  <!-- MEMBERSHIP -->
+  <div class="sub" id="membership">
+    <div class="wrap">
+      <div class="sub-grid">
+        <div class="reveal">
+          <h2>Every episode.<br>One membership. <b>Zero ads.</b></h2>
+          <p class="lead">unlisted+ is the private channel of the NOSIGNAL crew — everything we film ends up here, including the 40% the algorithm refuses. One price unlocks the whole archive.</p>
+          <ul class="feats">
+            <li><i data-lucide="check-circle-2"></i><div><b>340+ episodes</b> <span>— the full archive, forever</span></div></li>
+            <li><i data-lucide="check-circle-2"></i><div><b>Live every Friday</b> <span>— members-only chat while we're on air</span></div></li>
+            <li><i data-lucide="check-circle-2"></i><div><b>New drops weekly</b> <span>— comps, documentaries, podcasts</span></div></li>
+            <li><i data-lucide="check-circle-2"></i><div><b>Tour pre-sale access</b> <span>— 48 hours before everyone</span></div></li>
+            <li><i data-lucide="check-circle-2"></i><div><b>Cancel anytime</b> <span>— one click, no maze</span></div></li>
+          </ul>
+        </div>
+        <div class="pricecard reveal">
+          <div class="seg" id="planSeg">
+            <button class="on" data-plan="monthly">Monthly</button>
+            <button data-plan="annual">Annual <span class="save">2 MO FREE</span></button>
+          </div>
+          <div class="pricerow"><b id="priceBig">£6.99</b><span id="pricePer">/ month</span></div>
+          <p class="price-equiv" id="priceEquiv">BILLED MONTHLY · GBP</p>
+          <button class="btn btn-red btn-lg" data-join><i data-lucide="unlock"></i>Get unlisted+</button>
+          <p class="pnote"><b>7-DAY FREE TRIAL</b> · CANCEL ANYTIME<br>DEMO BUILD — NOTHING IS EVER CHARGED</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FAQ -->
+  <div class="wrap" id="faq">
+    <section>
+      <div class="shead">
+        <h2>Questions, answered</h2>
+        <span class="note">STILL STUCK?<br>CREW@UNLISTED.PLUS</span>
+      </div>
+      <div id="faqList"></div>
+    </section>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="wrap">
+      <div class="f-grid">
+        <div>
+          <a class="logo" href="#top">unlisted<b>+</b></a>
+          <p class="f-blurb">The private channel of the NOSIGNAL crew. If it was too much for the algorithm, it lives here.</p>
+          <div class="socials">
+            <a href="https://youtube.com" target="_blank" rel="noopener" aria-label="YouTube"><i data-lucide="youtube"></i></a>
+            <a href="https://instagram.com" target="_blank" rel="noopener" aria-label="Instagram"><i data-lucide="instagram"></i></a>
+            <a href="https://twitch.tv" target="_blank" rel="noopener" aria-label="Twitch"><i data-lucide="twitch"></i></a>
+            <a href="https://x.com" target="_blank" rel="noopener" aria-label="X"><i data-lucide="twitter"></i></a>
+          </div>
+        </div>
+        <div>
+          <h5>Watch</h5>
+          <a href="#drops">Latest drops</a>
+          <a href="#top10">Top 10</a>
+          <a href="#continueSec">Continue watching</a>
+          <a href="#membership">Membership</a>
+        </div>
+        <div>
+          <h5>Support</h5>
+          <a href="#faq">Help & FAQ</a>
+          <a href="mailto:crew@unlisted.plus">crew@unlisted.plus</a>
+        </div>
+        <div>
+          <h5>The crew</h5>
+          <a href="https://youtube.com" target="_blank" rel="noopener">NOSIGNAL on YouTube</a>
+          <a href="https://instagram.com" target="_blank" rel="noopener">Behind the scenes</a>
+        </div>
+      </div>
+      <div class="f-bottom">
+        <span>© 2025 UNLISTED+ — A NOSIGNAL PRODUCTION</span>
+        <span class="right"><span>MADE IN LONDON</span><span class="box">16+</span><span>V3.0</span></span>
+      </div>
+    </div>
+  </footer>
+</main>
+
+<!-- AUTH MODAL -->
+<div class="modal" id="authModal" role="dialog" aria-modal="true" aria-label="Account">
+  <div class="auth">
+    <div class="auth-tabs">
+      <button class="on" data-tab="signin">Sign in</button>
+      <button data-tab="create">Create account</button>
+    </div>
+    <div class="auth-body">
+      <div class="plan-chip" id="planChip" hidden><i data-lucide="unlock"></i><span id="planChipText">unlisted+ · £6.99 / month</span></div>
+      <form id="authForm" novalidate>
+        <label class="field" id="nameField" hidden><span>Name</span><input type="text" id="inName" placeholder="Alex Mercer" autocomplete="name"></label>
+        <label class="field"><span>Email</span><input type="email" id="inEmail" placeholder="you@somewhere.com" autocomplete="email"></label>
+        <label class="field"><span>Password</span><input type="password" id="inPass" placeholder="••••••••" autocomplete="current-password"></label>
+        <p class="ferr" id="fErr" hidden></p>
+        <button class="btn btn-red btn-lg" type="submit" id="authSubmit">Sign in</button>
+        <p class="fine" id="authFine">DEMO BUILD — NOTHING IS CHARGED</p>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- PLAYER MODAL -->
+<div class="modal" id="playerModal" role="dialog" aria-modal="true" aria-label="Player">
+  <div class="player">
+    <div class="pl-head">
+      <div class="l">
+        <span class="pl-badge" id="plBadge">PREVIEW</span>
+        <div class="pl-tt"><h4 id="plTitle"></h4><p id="plSub"></p></div>
+      </div>
+      <button class="pl-close" id="plClose" aria-label="Close player"><i data-lucide="x"></i></button>
+    </div>
+    <div class="pl-screen" id="plScreen">
+      <img id="plImg" src="" alt="">
+      <div class="pl-live" id="plLive" hidden><span class="dot"></span>LIVE</div>
+      <button class="pl-bigplay" id="plBig" aria-label="Play"><i data-lucide="play"></i></button>
+      <div class="pl-end" id="plEnd" hidden>
+        <p class="mono">PREVIEW ENDED · 1:00</p>
+        <h4>Keep watching with unlisted+</h4>
+        <div class="h-btns">
+          <button class="btn btn-red" id="plJoin"><i data-lucide="unlock"></i>Subscribe — £6.99/mo</button>
+          <button class="btn btn-ghost" id="plSignin">Sign in</button>
+        </div>
+      </div>
+    </div>
+    <div class="pl-bar">
+      <button class="pl-toggle" id="plToggle" aria-label="Play / pause"><i data-lucide="pause"></i></button>
+      <div class="pl-track" id="plTrack"><div class="pl-fill" id="plFill"></div></div>
+      <span class="pl-time" id="plTime">00:00 / 00:00</span>
+    </div>
+  </div>
+</div>
+
+<div id="toasts" role="status" aria-live="polite"></div>
+
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script>
+/* ============ helpers ============ */
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const esc=s=>String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+const icons=()=>window.lucide&&lucide.createIcons();
+const toSec=d=>d.split(':').reduce((a,b)=>a*60+ +b,0);
+function fmtT(s){s=Math.max(0,Math.floor(s));const h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=s%60,p=n=>String(n).padStart(2,'0');return(h?h+':':'')+p(m)+':'+p(x);}
+const fmtViews=v=>v>=1e6?(v/1e6).toFixed(1)+'M':v>=1e3?(v/1e3).toFixed(0)+'K':v;
+const firstName=n=>n.trim().split(/\s+/)[0];
+
+/* ============ state ============ */
+let user=null, plan='monthly', chip='all', q='';
+try{user=JSON.parse(localStorage.getItem('unl_user')||'null')}catch(e){}
+const getProg=()=>{try{return JSON.parse(localStorage.getItem('unl_prog')||'{}')}catch(e){return{}}};
+
+/* ============ data ============ */
+const CATALOG=[
+ {id:'finale',  title:'The Finale: Uncut',            cat:'documentary',dur:'1:32:07',views:2100000,seed:'unlfinale',  tier:'member',isNew:true, desc:'Ninety minutes, every camera rolling, nothing on the cutting room floor. What really happened on the last night of the tour.'},
+ {id:'nowhere', title:'24 Hours in Nowhere',          cat:'challenges', dur:'48:12',  views:1800000,seed:'unlnowhere', tier:'free',  isNew:true, desc:'Six of us, one empty town on the map, no phones and one backpack each. The most unhinged comp we have ever filmed.'},
+ {id:'chat42',  title:'Group Chat #42',               cat:'podcast',    dur:'1:14:55',views:960000, seed:'unlchat',    tier:'member',isNew:false,desc:'The regular Friday sit-down: the drafts, the beef, the group-chat leaks.'},
+ {id:'cookoff', title:'Cook-Off: Zero Budget',        cat:'challenges', dur:'32:40',  views:740000, seed:'unlcook',    tier:'free',  isNew:false,desc:'£0, one corner shop, forty minutes. Somehow someone still burnt cereal.'},
+ {id:'tour',    title:'Backstage: The Tour',          cat:'documentary',dur:'26:18',  views:520000, seed:'unltour',    tier:'free',  isNew:false,desc:'Ten minutes before the doors open, filmed every single night.'},
+ {id:'lastlv',  title:'Last to Leave the Studio',     cat:'challenges', dur:'1:02:33',views:1300000,seed:'unllast',    tier:'member',isNew:false,desc:'The lights stay on until one person quits. It took longer than anyone expected.'},
+ {id:'roast',   title:'Roast Battle III',             cat:'series',     dur:'44:02',  views:1100000,seed:'unlroast',   tier:'member',isNew:false,desc:'No notes. No mercy. No friendships left intact after round two.'},
+ {id:'charity', title:'Charity Match: Uncut',         cat:'documentary',dur:'1:58:20',views:3400000,seed:'unlchar',    tier:'member',isNew:false,desc:'Both halves, the tunnel argument and the half-time team talk, in full.'},
+ {id:'holiday', title:'£100 vs £10,000 Holiday',      cat:'travel',     dur:'39:47',  views:1600000,seed:'unlhol',     tier:'member',isNew:false,desc:'Two teams, two budgets, the same island. Guess which team complained more.'},
+ {id:'fanmeet', title:'The Fan Meet',                 cat:'series',     dur:'21:05',  views:410000, seed:'unlfan',     tier:'free',  isNew:false,desc:'A hundred fans, one warehouse, zero plan. It got emotional fast.'},
+ {id:'nightbus',title:'Night Bus Challenge',          cat:'challenges', dur:'55:31',  views:880000, seed:'unlbus',     tier:'member',isNew:true, desc:'Last bus wins. Everyone else walks home. In the rain.'},
+ {id:'deepdive',title:'Group Chat: The Deep Dive',    cat:'podcast',    dur:'1:41:09',views:670000, seed:'unldeep',    tier:'member',isNew:false,desc:'One topic, no time limit, three arguments that nearly ended the group.'},
+ {id:'moved',   title:'We Moved the Studio',          cat:'series',     dur:'18:22',  views:230000, seed:'unlmove',    tier:'free',  isNew:false,desc:'Three days, one van, six people who cannot pack. A moving documentary.'},
+ {id:'alaska',  title:'48 Hours in the Middle of Nowhere',cat:'travel',  dur:'1:07:44',views:1250000,seed:'unlaka',     tier:'member',isNew:false,desc:'The furthest from civilisation we have ever been. Also the coldest.'}
+];
+const CAT_LABEL={challenges:'Challenges',series:'Series',documentary:'Documentary',podcast:'Podcasts',travel:'Travel'};
+const byId=id=>CATALOG.find(x=>x.id===id);
+const SLIDES=[
+ {id:'finale', tag:'NEW DROP'},
+ {id:'nowhere',tag:'NEW DROP'},
+ {id:'chat42', tag:'FRIDAY LIVE'}
+];
+const TOP10=['finale','nightbus','chat42','holiday','lastlv','charity','nowhere','deepdive','roast','cookoff'];
+const FAQ=[
+ ['What do I actually get?','Every episode we have ever filmed — including the ones the main channel refused — plus the Friday live stream with members-only chat, tour pre-sale access and new drops every single week. One price, everything included.'],
+ ['Can I cancel anytime?','Yes. One click in your account. You keep access until the end of the billing period, then you are out. No retention maze, no phone calls, no guilt-trip carousel.'],
+ ['Where can I watch?','Right here in the browser, or on your phone, tablet or TV. The player remembers exactly where you stopped — which for a two-hour finale matters more than you would think.'],
+ ['Is there an age rating?','Most drops are 16+. A few of the late-night comps run 18+. Every episode is labelled before you press play, so the only surprises are the intended ones.'],
+ ['Can I gift a membership?','You can. Pick a plan, send the code, take the credit. The gift sits in your account until they redeem it — and yes, you will be able to see if they never do.']
+];
+
+/* ============ toast ============ */
+function toast(msg,icon='check-circle-2'){
+  const t=document.createElement('div');
+  t.className='toast';
+  t.innerHTML=`<i data-lucide="${icon}"></i><span>${msg}</span>`;
+  $('#toasts').appendChild(t);icons();
+  setTimeout(()=>{t.classList.add('out');setTimeout(()=>t.remove(),320)},3400);
+}
+
+/* ============ hero carousel ============ */
+let slide=0, heroTimer=null;
+function heroButtons(it){
+  const isFree=it.tier==='free'||user;
+  return `
+   <button class="btn btn-white btn-lg" data-play="${it.id}"><i data-lucide="play"></i>${isFree?'Watch now':'Play preview'}</button>
+   ${user?'':`<button class="btn btn-ghost btn-lg" data-join><i data-lucide="unlock"></i>Get access</button>`}`;
+}
+function renderHero(){
+  const it=byId(SLIDES[slide].id);
+  const el=$('#heroText');
+  el.classList.remove('anim');void el.offsetWidth;el.classList.add('anim');
+  el.innerHTML=`
+    <div class="h-badges">
+      <span class="tag tag-red">${SLIDES[slide].tag}</span>
+      <span class="tag tag-dark">${CAT_LABEL[it.cat].toUpperCase()}</span>
+      ${it.isNew?`<span class="tag tag-dark">EPISODE 1 OF 1</span>`:''}
+    </div>
+    <h1>${esc(it.title)}</h1>
+    <p>${esc(it.desc)}</p>
+    <div class="h-meta"><span>${it.dur}</span><i></i><span>${fmtViews(it.views)} VIEWS</span><i></i><span>16+</span><i></i><span>4K</span></div>
+    <div class="h-btns">${heroButtons(it)}</div>`;
+  icons();
+}
+function setSlide(i){
+  slide=i;
+  $$('.slide').forEach((s,k)=>s.classList.toggle('on',k===i));
+  $$('#heroDots button').forEach((d,k)=>d.classList.toggle('on',k===i));
+  renderHero();
+}
+function startHero(){
+  clearInterval(heroTimer);
+  heroTimer=setInterval(()=>setSlide((slide+1)%SLIDES.length),6500);
+}
+ $('#heroDots').innerHTML=SLIDES.map((_,i)=>`<button aria-label="Slide ${i+1}" data-i="${i}"></button>`).join('');
+ $('#heroDots').addEventListener('click',e=>{const b=e.target.closest('button');if(b){setSlide(+b.dataset.i);startHero();}});
+ $('#hero').addEventListener('mouseenter',()=>clearInterval(heroTimer));
+ $('#hero').addEventListener('mouseleave',startHero);
+renderHero();startHero();
+
+/* ============ card grid ============ */
+function badgeHtml(it){
+  const bits=[];
+  if(it.isNew)bits.push(`<span class="tag tag-red b-new">NEW</span>`);
+  else if(it.tier==='free')bits.push(`<span class="tag tag-dark b-new" style="background:#fff;color:#000">FREE</span>`);
+  if(it.tier==='member'&&!user)bits.push(`<span class="b-lock"><i data-lucide="lock"></i>MEMBERS</span>`);
+  return bits.join('');
+}
+function cardHtml(it,i,feat){
+  return `
+  <div class="card ${feat?'feat':''}" data-id="${it.id}" tabindex="0" role="button" aria-label="${esc(it.title)}" style="animation-delay:${Math.min(i*45,400)}ms">
+    <div class="thumb">
+      <img src="https://picsum.photos/seed/${it.seed}/${feat?960:640}/${feat?540:360}.jpg" alt="${esc(it.title)}" loading="lazy">
+      ${badgeHtml(it)}
+      <span class="b-dur">${it.dur}</span>
+      <span class="b-play"><i data-lucide="play"></i></span>
+    </div>
+    <div class="cbody">
+      <h3>${esc(it.title)}</h3>
+      <p class="cmeta">${CAT_LABEL[it.cat]} · ${it.dur} · ${fmtViews(it.views)} views</p>
+      ${feat?`<p class="cdesc">${esc(it.desc)}</p>`:''}
+    </div>
+  </div>`;
+}
+function renderGrid(){
+  const list=CATALOG.filter(it=>(chip==='all'||it.cat===chip)&&(!q||(it.title+' '+CAT_LABEL[it.cat]).toLowerCase().includes(q)));
+  $('#gridNote').textContent=`${list.length} DROP${list.length===1?'':'S'} · ${q?`MATCHING “${q.toUpperCase()}”`:'UPDATED WEEKLY'}`;
+  if(!list.length){
+    $('#grid').innerHTML=`<div class="empty"><i data-lucide="search-x"></i><p>Nothing in the vault matches that. Try another word — or challenge us to film it.</p><button class="btn btn-ghost btn-sm" id="clearSearch">Clear search</button></div>`;
+    icons();
+    $('#clearSearch').addEventListener('click',()=>{q='';$('#searchInput').value='';$('#searchInputM').value='';renderGrid();});
+    return;
+  }
+  $('#grid').innerHTML=list.map((it,i)=>cardHtml(it,i,i===0)).join('');
+  icons();
+}
+
+/* ============ top 10 rail ============ */
+function renderTop10(){
+  $('#topRail').innerHTML=TOP10.map((id,i)=>{
+    const it=byId(id);
+    return `
+    <div class="rank" data-id="${it.id}" tabindex="0" role="button" aria-label="Number ${i+1}: ${esc(it.title)}">
+      <span class="rnum">${i+1}</span>
+      <div class="rthumb">
+        <img src="https://picsum.photos/seed/${it.seed}/400/225.jpg" alt="${esc(it.title)}" loading="lazy">
+        <span class="b-dur">${it.dur}</span>
+      </div>
+    </div>`;}).join('');
+  icons();
+}
+
+/* ============ continue watching ============ */
+function renderContinue(){
+  const prog=getProg(), ids=Object.keys(prog).filter(id=>byId(id)&&prog[id]>5);
+  $('#continueSec').style.display=(user&&ids.length)?'':'none';
+  if(!user||!ids.length)return;
+  $('#continueRail').innerHTML=ids.map(id=>{
+    const it=byId(id),p=prog[id],pc=Math.min(100,p/toSec(it.dur)*100);
+    return `
+    <div class="cwatch" data-id="${it.id}" tabindex="0" role="button" aria-label="Resume ${esc(it.title)}">
+      <div class="thumb">
+        <img src="https://picsum.photos/seed/${it.seed}/528/297.jpg" alt="${esc(it.title)}" loading="lazy">
+        <span class="b-play"><i data-lucide="play"></i></span>
+      </div>
+      <div class="cprog"><i style="width:${pc}%"></i></div>
+      <div class="cbody">
+        <h3>${esc(it.title)}</h3>
+        <p class="cmeta">RESUME · ${fmtT(p)} / ${it.dur}</p>
+      </div>
+    </div>`;}).join('');
+  icons();
+}
+
+/* ============ play routing ============ */
+function playItem(id){
+  const it=byId(id);if(!it)return;
+  if(it.tier==='free'||user)openPlayer(it,'full');
+  else{toast('Members only — 60-second preview on the house.','lock');openPlayer(it,'preview');}
+}
+
+/* delegated clicks for cards / rails / hero buttons */
+document.addEventListener('click',e=>{
+  const p=e.target.closest('[data-play]');
+  if(p){playItem(p.dataset.play);return;}
+  const c=e.target.closest('.card,.cwatch,.rank');
+  if(c){playItem(c.dataset.id);return;}
+});
+document.addEventListener('keydown',e=>{
+  if(e.key!=='Enter'&&e.key!==' ')return;
+  const c=e.target.closest?.('.card,.cwatch,.rank');
+  if(c){e.preventDefault();playItem(c.dataset.id);}
+});
+
+/* ============ player ============ */
+const PREVIEW_LEN=60;
+const P={mode:null,it:null,dur:0,cur:0,playing:false,iv:null};
+function openPlayer(it,mode,startAt){
+  P.it=it;P.mode=mode;
+  P.dur=mode==='full'?toSec(it.dur):Math.min(PREVIEW_LEN,toSec(it.dur));
+  P.cur=startAt!=null?Math.min(startAt,P.dur-5):(mode==='full'?0:0);
+  P.playing=true;
+  $('#plTitle').textContent=it.title;
+  $('#plSub').textContent=`${CAT_LABEL[it.cat].toUpperCase()} · ${it.dur} · ${fmtViews(it.views)} VIEWS`;
+  const b=$('#plBadge');
+  b.textContent=mode==='preview'?'PREVIEW':mode==='full'?'FULL EPISODE':'';
+  b.classList.toggle('full',mode==='full');
+  $('#plImg').src=`https://picsum.photos/seed/${it.seed}/1280/720.jpg`;
+  $('#plEnd').hidden=true;
+  $('#plScreen').classList.remove('paused');
+  tickStart();playerUI();
+  openModal($('#playerModal'));
+}
+function tickStart(){
+  clearInterval(P.iv);
+  P.iv=setInterval(()=>{
+    if(!P.playing)return;
+    P.cur++;
+    if(P.cur>=P.dur){
+      if(P.mode==='preview'){P.cur=P.dur;P.playing=false;$('#plEnd').hidden=false;}
+      else P.cur=P.dur,P.playing=false;
+    }
+    playerUI();
+  },1000);
+}
+function playerUI(){
+  const fill=$('#plFill'),time=$('#plTime');
+  if(P.mode==='live'){fill.classList.add('scan');time.textContent='LIVE · '+fmtT(P.cur);}
+  else{
+    fill.classList.remove('scan');
+    fill.style.width=(P.dur?P.cur/P.dur*100:0)+'%';
+    time.textContent=fmtT(P.cur)+' / '+fmtT(P.dur);
+  }
+  $('#plScreen').classList.toggle('paused',!P.playing);
+  $('#plToggle').innerHTML=`<i data-lucide="${P.playing?'pause':'play'}"></i>`;
+  icons();
+}
+function togglePlay(){if(P.playing===false&&P.cur>=P.dur&&P.mode==='preview'){$('#plEnd').hidden=false;return;}P.playing=!P.playing;playerUI();}
+ $('#plToggle').addEventListener('click',togglePlay);
+ $('#plBig').addEventListener('click',e=>{e.stopPropagation();togglePlay();});
+ $('#plScreen').addEventListener('click',e=>{if(e.target.closest('.pl-end'))return;togglePlay();});
+ $('#plTrack').addEventListener('click',e=>{
+  if(P.mode!=='full'||!P.dur)return;
+  const r=e.currentTarget.getBoundingClientRect();
+  P.cur=Math.round(Math.min(1,Math.max(0,(e.clientX-r.left)/r.width))*P.dur);
+  playerUI();
+});
+ $('#plClose').addEventListener('click',()=>closePlayer());
+function closePlayer(){
+  if(P.mode==='full'&&P.it&&user){
+    const p=getProg();p[P.it.id]=P.cur;localStorage.setItem('unl_prog',JSON.stringify(p));
+    renderContinue();
+  }
+  clearInterval(P.iv);
+  closeModal($('#playerModal'));
+}
+ $('#plJoin').addEventListener('click',()=>{closePlayer();openAuth('create');});
+ $('#plSignin').addEventListener('click',()=>{closePlayer();openAuth('signin');});
+
+/* ============ modals ============ */
+function openModal(m){m.classList.add('open');document.body.style.overflow='hidden';}
+function closeModal(m){
+  m.classList.remove('open');
+  if(!$('.modal.open'))document.body.style.overflow='';
+  if(m.id==='playerModal')closePlayer();
+}
+ $$('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)closeModal(m);}));
+document.addEventListener('keydown',e=>{if(e.key==='Escape')$$('.modal.open').forEach(closeModal);});
+
+/* ============ auth ============ */
+let authTab='signin';
+function openAuth(tab){
+  if(user){toast('You are already on the inside.','check-circle-2');return;}
+  setAuthTab(tab||'signin');
+  openModal($('#authModal'));
+  setTimeout(()=>$('#inEmail').focus(),60);
+}
+function setAuthTab(tab){
+  authTab=tab;
+  $$('.auth-tabs button').forEach(b=>b.classList.toggle('on',b.dataset.tab===tab));
+  $('#nameField').hidden=tab!=='create';
+  $('#planChip').hidden=tab!=='create';
+  $('#authSubmit').textContent=tab==='create'?'Start free trial':'Sign in';
+  $('#authFine').textContent=tab==='create'?'7-DAY FREE TRIAL · CANCEL ANYTIME · NOTHING CHARGED':'YOU KEEP ACCESS TO THE END OF THE BILLING PERIOD';
+  $('#fErr').hidden=true;
+}
+ $$('.auth-tabs button').forEach(b=>b.addEventListener('click',()=>setAuthTab(b.dataset.tab)));
+function showErr(m){const e=$('#fErr');e.textContent=m;e.hidden=false;}
+ $('#authForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  const email=$('#inEmail').value.trim(),pass=$('#inPass').value;
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email))return showErr('That email looks off — give it another go.');
+  if(pass.length<6)return showErr('Password needs at least 6 characters.');
+  if(authTab==='create'){
+    const name=$('#inName').value.trim();
+    if(name.length<2)return showErr('We need a name to put on the badge.');
+    user={name,email};localStorage.setItem('unl_user',JSON.stringify(user));
+    closeModal($('#authModal'));
+    toast(`Welcome to the inside, ${esc(firstName(name))}.`,'check-circle-2');
+    refreshAll();
+  }else{
+    const stored=JSON.parse(localStorage.getItem('unl_user')||'null');
+    if(!stored||stored.email.toLowerCase()!==email.toLowerCase())return showErr('No account with that email. Hit "Create account" — takes 20 seconds.');
+    user=stored;closeModal($('#authModal'));
+    toast(`Good to see you again, ${esc(firstName(stored.name))}.`,'check-circle-2');
+    refreshAll();
+  }
+  $('#authForm').reset();
+});
+function refreshAll(){updateHeader();renderGrid();renderContinue();renderHero();}
+
+/* ============ header user state ============ */
+function updateHeader(){
+  const hr=$('#hdRight'),da=$('#drawerAuth');
+  if(user){
+    const ini=esc((firstName(user.name)[0]||'U').toUpperCase());
+    hr.innerHTML=`
+      <div class="searchbox"><i data-lucide="search"></i><input id="searchInput" type="text" placeholder="Search drops…" aria-label="Search"></div>
+      <button class="iconbtn" id="mSearchBtn" aria-label="Search"><i data-lucide="search"></i></button>
+      <button class="avatar" id="avatarBtn" aria-label="Account menu">${ini}
+        <div class="umenu" id="umenu">
+          <button id="uContinue"><i data-lucide="play-circle"></i>Continue watching</button>
+          <button id="uLogout"><i data-lucide="log-out"></i>Log out</button>
+        </div>
+      </button>`;
+    da.innerHTML=`<button class="btn btn-red btn-lg" data-scroll="#drops" style="width:100%"><i data-lucide="play"></i>Watch now</button>`;
+    icons();wireSearch();
+    $('#avatarBtn').addEventListener('click',e=>{e.stopPropagation();$('#umenu').classList.toggle('open');});
+    $('#uLogout').addEventListener('click',()=>{user=null;localStorage.removeItem('unl_user');$('#umenu').classList.remove('open');updateHeader();renderGrid();renderContinue();renderHero();toast('Logged out. The archive will miss you.','log-out');});
+    $('#uContinue').addEventListener('click',()=>{$('#umenu').classList.remove('open');const s=$('#continueSec');s.style.display?toast('Watch something first — your row is waiting.','play-circle'):s.scrollIntoView({behavior:'smooth'});});
+  }else{
+    hr.innerHTML=`
+      <div class="searchbox"><i data-lucide="search"></i><input id="searchInput" type="text" placeholder="Search drops…" aria-label="Search"></div>
+      <button class="iconbtn" id="mSearchBtn" aria-label="Search"><i data-lucide="search"></i></button>
+      <button class="iconbtn" id="burger" aria-label="Menu"><i data-lucide="menu"></i></button>
+      <button class="btn btn-ghost btn-sm" data-auth="signin">Sign in</button>
+      <button class="btn btn-red btn-sm" data-join>Subscribe</button>`;
+    da.innerHTML=`
+      <button class="btn btn-ghost" data-auth="signin" style="width:100%">Sign in</button>
+      <button class="btn btn-red" data-join style="width:100%;margin-top:10px">Subscribe</button>`;
+    icons();wireSearch();
+  }
+  wireDrawer();
+}
+
+/* ============ search ============ */
+function wireSearch(){
+  const inp=$('#searchInput');
+  if(inp)inp.addEventListener('input',()=>{q=inp.value.trim().toLowerCase();renderGrid();});
+  const mb=$('#mSearchBtn');
+  if(mb)mb.addEventListener('click',()=>{$('#mSearch').classList.toggle('open');$('#searchInputM').focus();});
+}
+ $('#searchInputM').addEventListener('input',e=>{q=e.target.value.trim().toLowerCase();renderGrid();});
+
+/* ============ chips ============ */
+ $('#chips').addEventListener('click',e=>{
+  const c=e.target.closest('.chip');if(!c)return;
+  chip=c.dataset.cat;
+  $$('#chips .chip').forEach(x=>x.classList.toggle('on',x===c));
+  renderGrid();
+});
+
+/* ============ pricing ============ */
+ $('#planSeg').addEventListener('click',e=>{
+  const b=e.target.closest('button');if(!b||b.dataset.plan===plan)return;
+  plan=b.dataset.plan;
+  $$('#planSeg button').forEach(x=>x.classList.toggle('on',x===b));
+  const m=plan==='monthly';
+  $('#priceBig').textContent=m?'£6.99':'£59.99';
+  $('#pricePer').textContent=m?'/ month':'/ year';
+  $('#priceEquiv').textContent=m?'BILLED MONTHLY · GBP':'≈ £5.00 / MONTH · BILLED ANNUALLY';
+  $('#planChipText').textContent=`unlisted+ · ${m?'£6.99 / month':'£59.99 / year'}`;
+});
+
+/* ============ live band ============ */
+let viewers=12481;
+setInterval(()=>{viewers=Math.max(9000,viewers+Math.floor(Math.random()*57-22));$('#liveViewers').textContent=viewers.toLocaleString('en-GB');},1600);
+ $('#joinLive').addEventListener('click',()=>{
+  if(!user){toast('The live room is members-only.','lock');openAuth('create');return;}
+  const live={id:'chat42',title:'Group Chat — LIVE',cat:'podcast',dur:'1:14:55',views:viewers,seed:'unlchat',tier:'member',desc:''};
+  P.mode='live';P.it=live;P.dur=0;P.cur=2400+Math.floor(Math.random()*1800);P.playing=true;
+  $('#plTitle').textContent=live.title;
+  $('#plSub').textContent='LIVE FROM THE STUDIO · MEMBERS ONLY';
+  const b=$('#plBadge');b.textContent='LIVE';b.classList.remove('full');
+  $('#plImg').src=`https://picsum.photos/seed/unlchat/1280/720.jpg`;
+  $('#plEnd').hidden=true;
+  $('#plScreen').classList.remove('paused');
+  clearInterval(P.iv);
+  P.iv=setInterval(()=>{if(P.playing){P.cur++;playerUI();}},1000);
+  playerUI();openModal($('#playerModal'));
+});
+
+/* countdown to next Friday 18:00 */
+function nextFriday(){
+  const n=new Date(),t=new Date(n);
+  t.setDate(n.getDate()+((5-n.getDay()+7)%7));t.setHours(18,0,0,0);
+  if(t<=n)t.setDate(t.getDate()+7);
+  return t;
+}
+setInterval(()=>{
+  let ms=nextFriday()-Date.now();
+  const d=Math.floor(ms/864e5);ms-=d*864e5;
+  const h=Math.floor(ms/36e5);ms-=h*36e5;
+  const m=Math.floor(ms/6e4),s=Math.floor(ms%6e4/1000),p=x=>String(x).padStart(2,'0');
+  $('#cdText').textContent=`${p(d)}:${p(h)}:${p(m)}:${p(s)}`;
+},1000);
+
+/* ============ faq ============ */
+ $('#faqList').innerHTML=FAQ.map((f,i)=>`
+  <div class="faqrow">
+    <button class="faq-q"><span class="n">0${i+1}</span><span>${esc(f[0])}</span><i data-lucide="plus"></i></button>
+    <div class="faq-a"><p>${esc(f[1])}</p></div>
+  </div>`).join('');
+ $$('.faq-q').forEach(b=>b.addEventListener('click',()=>{
+  const row=b.parentElement,a=row.querySelector('.faq-a'),open=row.classList.toggle('open');
+  a.style.maxHeight=open?a.scrollHeight+'px':'0px';
+}));
+
+/* ============ drawer / scroll / misc ============ */
+function wireDrawer(){
+  const b=$('#burger');
+  if(b)b.addEventListener('click',()=>{$('#drawer').classList.add('open');$('#scrim').classList.add('open');});
+}
+const closeDrawer=()=>{$('#drawer').classList.remove('open');$('#scrim').classList.remove('open');$('#mSearch').classList.remove('open');};
+ $('#scrim').addEventListener('click',closeDrawer);
+ $$('.dlink').forEach(a=>a.addEventListener('click',closeDrawer));
+document.addEventListener('click',e=>{
+  const sc=e.target.closest('[data-scroll]');
+  if(sc){closeDrawer();$(sc.dataset.scroll)?.scrollIntoView({behavior:'smooth'});return;}
+  if(e.target.closest('[data-join]')){closeDrawer();openAuth('create');return;}
+  const a=e.target.closest('[data-auth]');
+  if(a){closeDrawer();openAuth(a.dataset.auth);return;}
+  if(!e.target.closest('#avatarBtn'))$('#umenu')?.classList.remove('open');
+});
+addEventListener('scroll',()=>$('#hd').classList.toggle('scrolled',scrollY>10),{passive:true});
+
+/* reveal on scroll */
+const io=new IntersectionObserver(es=>es.forEach(en=>{
+  if(en.isIntersecting){en.target.classList.add('in');io.unobserve(en.target);}
+}),{threshold:.12});
+ $$('.reveal').forEach(el=>io.observe(el));
+
+/* ============ boot ============ */
+updateHeader();
+renderGrid();
+renderTop10();
+renderContinue();
+icons();
+</script>
+</body>
+</html>

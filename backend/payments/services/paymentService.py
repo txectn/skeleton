@@ -41,7 +41,6 @@ class PaymentService:
                 }
             )
 
-
         if order.status == order.Status.CONFIRMED:
             
             order_status = order.status
