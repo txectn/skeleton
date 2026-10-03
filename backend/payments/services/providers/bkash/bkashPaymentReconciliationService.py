@@ -5,18 +5,21 @@ from django.core.cache import cache
 from rest_framework.exceptions import ValidationError
 
 class BkashPaymentReconciliationService:
+    """Handles bKash payment reconciliation through Query Payment."""
 
     TOKEN_CACHE_KEY = "bkash_access_token"
     TOKEN_CACHE_TIMEOUT = 3300
 
+    QUERY_PAYMENT_PATH = (
+        "/v2/tokenized-checkout/query/payment"
+    )
+
     @staticmethod
     def can_handle(provider):
-
         return provider == "bkash"
 
     @staticmethod
     def get_access_token():
-
         access_token = cache.get(
             BkashPaymentReconciliationService.TOKEN_CACHE_KEY,
         )
@@ -99,6 +102,12 @@ class BkashPaymentReconciliationService:
 
     @staticmethod
     def reconcile(payment_attempt):
+        """
+        Query bKash for the current state of a payment.
+
+        This is primarily used when Execute Payment times out
+        or when the local payment state is uncertain.
+        """
 
         payment_id = payment_attempt.provider_payment_id
 
@@ -117,7 +126,7 @@ class BkashPaymentReconciliationService:
 
         url = (
             f"{settings.BKASH_BASE_URL}"
-            "/tokenized/checkout/payment/status"
+            f"{BkashPaymentReconciliationService.QUERY_PAYMENT_PATH}"
         )
 
         headers = {
@@ -128,7 +137,7 @@ class BkashPaymentReconciliationService:
         }
 
         data = {
-            "paymentID": payment_id,
+            "paymentId": payment_id,
         }
 
         try:
@@ -154,7 +163,7 @@ class BkashPaymentReconciliationService:
             raise ValidationError(
                 {
                     "payment": (
-                        "Invalid payment status response "
+                        "Invalid payment query response "
                         "received from bKash."
                     )
                 }
@@ -165,7 +174,7 @@ class BkashPaymentReconciliationService:
                 {
                     "payment": (
                         result.get(
-                            "statusMessage",
+                            "errorMessageEn",
                             "Unable to retrieve "
                             "bKash payment status.",
                         )
@@ -178,28 +187,25 @@ class BkashPaymentReconciliationService:
         )
 
         transaction_id = result.get(
-            "trxID",
+            "trxId",
         )
 
         if transaction_status == "Completed":
-
             return {
                 "status": "success",
                 "transaction_id": transaction_id,
+                "provider_response": result,
             }
 
-        if transaction_status in (
-            "Cancelled",
-            "Failed",
-            "Expired",
-        ):
-
+        if transaction_status == "Initiated":
             return {
-                "status": "failed",
+                "status": "pending",
                 "transaction_id": transaction_id,
+                "provider_response": result,
             }
 
         return {
             "status": "pending",
             "transaction_id": transaction_id,
+            "provider_response": result,
         }

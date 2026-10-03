@@ -1,7 +1,7 @@
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from ..services import PaymentVerificationService
+from ..services import PaymentWebhookService
 
 class PaymentWebhookView(APIView):
 
@@ -10,7 +10,7 @@ class PaymentWebhookView(APIView):
 
     def post(self, request):
 
-        PaymentVerificationService.process_webhook(
+        PaymentWebhookService.process_webhook(
             data=request.data,
         )
 

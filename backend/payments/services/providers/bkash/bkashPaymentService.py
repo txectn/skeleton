@@ -8,7 +8,9 @@ from .bkashTokenService import BkashTokenService
 class BkashPaymentService:
     """Handles bKash payment creation."""
 
-    CREATE_PAYMENT_PATH = "/tokenized/checkout/create"
+    CREATE_PAYMENT_PATH = (
+        "/v2/tokenized-checkout/payment/create"
+    )
 
     @staticmethod
     def _get_url(path):
@@ -19,8 +21,9 @@ class BkashPaymentService:
 
     @staticmethod
     def _mark_attempt_failed(payment_attempt):
-        if payment_attempt.status != (
-            payment_attempt.Status.FAILED
+        if (
+            payment_attempt.status
+            != payment_attempt.Status.FAILED
         ):
             payment_attempt.status = (
                 payment_attempt.Status.FAILED
@@ -63,6 +66,10 @@ class BkashPaymentService:
         BkashTokenService.
         """
 
+        # ---------------------------------------------------------
+        # Get bKash ID Token
+        # ---------------------------------------------------------
+
         try:
             id_token = (
                 BkashTokenService.get_id_token()
@@ -74,32 +81,47 @@ class BkashPaymentService:
                 "Unable to authenticate with bKash.",
             )
 
+        # ---------------------------------------------------------
+        # URL
+        # ---------------------------------------------------------
+
         url = cls._get_url(
             cls.CREATE_PAYMENT_PATH,
         )
 
+        # ---------------------------------------------------------
+        # Headers
+        # ---------------------------------------------------------
+
         headers = {
-            "Content-Type": "application/json",
-            "Accept": "application/json",
             "Authorization": id_token,
-            "X-APP-Key": settings.BKASH_APP_KEY,
+            "X-App-Key": settings.BKASH_APP_KEY,
+            "Content-Type": "application/json",
         }
 
+        # ---------------------------------------------------------
+        # Request Data
+        # ---------------------------------------------------------
+
         data = {
-            "mode": "0011",
             "payerReference": (
                 f"PAYMENT-{payment_attempt.id}"
             ),
             "callbackURL": (
                 settings.BKASH_CALLBACK_URL
             ),
-            "amount": str(order.total),
+            "amount": f"{order.total:.2f}",
             "currency": "BDT",
             "intent": "sale",
             "merchantInvoiceNumber": (
                 f"ORDER-{order.id}"
+                f"-ATTEMPT-{payment_attempt.id}"
             ),
         }
+
+        # ---------------------------------------------------------
+        # Request bKash
+        # ---------------------------------------------------------
 
         try:
             response = requests.post(
@@ -115,6 +137,10 @@ class BkashPaymentService:
                 "Unable to connect to bKash.",
             )
 
+        # ---------------------------------------------------------
+        # Parse Response
+        # ---------------------------------------------------------
+
         try:
             result = response.json()
 
@@ -124,18 +150,37 @@ class BkashPaymentService:
                 "Invalid response received from bKash.",
             )
 
+        # ---------------------------------------------------------
+        # HTTP Status
+        # ---------------------------------------------------------
+
         if not response.ok:
-            cls._raise_payment_error(
-                payment_attempt,
+            error_message = result.get(
+                "errorMessageEn",
                 "bKash payment creation failed.",
             )
 
-        provider_payment_id = result.get(
-            "paymentID"
-        )
+            external_code = result.get(
+                "externalCode"
+            )
 
-        payment_url = result.get(
-            "bkashURL"
+            if external_code:
+                error_message = (
+                    f"bKash Error ({external_code}): "
+                    f"{error_message}"
+                )
+
+            cls._raise_payment_error(
+                payment_attempt,
+                error_message,
+            )
+
+        # ---------------------------------------------------------
+        # Provider Payment ID
+        # ---------------------------------------------------------
+
+        provider_payment_id = result.get(
+            "paymentId"
         )
 
         if not provider_payment_id:
@@ -144,11 +189,23 @@ class BkashPaymentService:
                 "bKash did not return a payment ID.",
             )
 
+        # ---------------------------------------------------------
+        # Payment URL
+        # ---------------------------------------------------------
+
+        payment_url = result.get(
+            "bkashURL"
+        )
+
         if not payment_url:
             cls._raise_payment_error(
                 payment_attempt,
                 "bKash did not return a payment URL.",
             )
+
+        # ---------------------------------------------------------
+        # Save Provider Payment ID
+        # ---------------------------------------------------------
 
         payment_attempt.provider_payment_id = (
             provider_payment_id
@@ -161,7 +218,13 @@ class BkashPaymentService:
             ]
         )
 
+        # ---------------------------------------------------------
+        # Return Result
+        # ---------------------------------------------------------
+
         return {
             "payment_url": payment_url,
-            "provider_payment_id": provider_payment_id,
+            "provider_payment_id": (
+                provider_payment_id
+            ),
         }

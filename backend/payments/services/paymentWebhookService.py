@@ -2,17 +2,17 @@ from django.db import transaction
 from rest_framework.exceptions import ValidationError
 
 from .providers import (
-    BkashPaymentVerificationService,
-    # NagadPaymentVerificationService,
-    # VisaPaymentVerificationService,
+    BkashPaymentWebhookVerificationService,
+    # NagadPaymentWebhookService,
+    # VisaPaymentWebhookService,
 )
 
-class PaymentVerificationService:
+class PaymentWebhookService:
 
     PROVIDERS = (
-        BkashPaymentVerificationService,
-        # NagadPaymentVerificationService,
-        # VisaPaymentVerificationService,
+        BkashPaymentWebhookVerificationService,
+        # NagadPaymentWebhookService,
+        # VisaPaymentWebhookService,
     )
 
     @staticmethod
@@ -25,7 +25,7 @@ class PaymentVerificationService:
 
         provider_service = None
 
-        for service in PaymentVerificationService.PROVIDERS:
+        for service in PaymentWebhookService.PROVIDERS:
 
             if service.can_handle(data):
                 provider_service = service
@@ -163,7 +163,7 @@ class PaymentVerificationService:
 PaymentWebhookView
         │
         ▼
-PaymentVerificationService
+PaymentWebhookService
         │
         ├── identify provider
         │

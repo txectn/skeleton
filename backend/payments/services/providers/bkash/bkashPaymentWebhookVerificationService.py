@@ -6,9 +6,9 @@ from django.conf import settings
 from django.core.cache import cache
 from rest_framework.exceptions import ValidationError
 
-from ...models import PaymentAttempt
+from ....models import PaymentAttempt
 
-class BkashPaymentVerificationService:
+class BkashPaymentWebhookVerificationService:
 
     TOKEN_CACHE_KEY = "bkash_access_token"
     TOKEN_CACHE_TIMEOUT = 3300
@@ -131,14 +131,14 @@ class BkashPaymentVerificationService:
     def get_access_token():
 
         access_token = cache.get(
-            BkashPaymentVerificationService.TOKEN_CACHE_KEY,
+            BkashPaymentWebhookVerificationService.TOKEN_CACHE_KEY,
         )
 
         if access_token:
 
             return access_token
 
-        url = BkashPaymentVerificationService._get_url(
+        url = BkashPaymentWebhookVerificationService._get_url(
             "/tokenized/checkout/token/grant",
         )
 
@@ -212,7 +212,7 @@ class BkashPaymentVerificationService:
 
         expires_in = result.get(
             "expires_in",
-            BkashPaymentVerificationService.TOKEN_CACHE_TIMEOUT,
+            BkashPaymentWebhookVerificationService.TOKEN_CACHE_TIMEOUT,
         )
 
         try:
@@ -222,13 +222,13 @@ class BkashPaymentVerificationService:
         except (TypeError, ValueError):
 
             expires_in = (
-                BkashPaymentVerificationService
+                BkashPaymentWebhookVerificationService
                 .TOKEN_CACHE_TIMEOUT
             )
 
         cache_timeout = min(
             expires_in - 60,
-            BkashPaymentVerificationService
+            BkashPaymentWebhookVerificationService
             .TOKEN_CACHE_TIMEOUT,
         )
 
@@ -237,7 +237,7 @@ class BkashPaymentVerificationService:
             cache_timeout = 60
 
         cache.set(
-            BkashPaymentVerificationService.TOKEN_CACHE_KEY,
+            BkashPaymentWebhookVerificationService.TOKEN_CACHE_KEY,
             access_token,
             cache_timeout,
         )
@@ -284,12 +284,12 @@ class BkashPaymentVerificationService:
     def search_transaction(transaction_id):
 
         access_token = (
-            BkashPaymentVerificationService
+            BkashPaymentWebhookVerificationService
             .get_access_token()
         )
 
-        url = BkashPaymentVerificationService._get_url(
-            BkashPaymentVerificationService
+        url = BkashPaymentWebhookVerificationService._get_url(
+            BkashPaymentWebhookVerificationService
             .SEARCH_TRANSACTION_PATH,
         )
 
@@ -359,7 +359,7 @@ class BkashPaymentVerificationService:
     def verify_webhook(data):
 
         transaction_data = (
-            BkashPaymentVerificationService
+            BkashPaymentWebhookVerificationService
             .validate_webhook_data(data)
         )
 
@@ -433,7 +433,7 @@ class BkashPaymentVerificationService:
         # -----------------------------------------------------
 
         payment_attempt = (
-            BkashPaymentVerificationService
+            BkashPaymentWebhookVerificationService
             .get_payment_attempt(
                 merchant_invoice_number,
             )
@@ -462,7 +462,7 @@ class BkashPaymentVerificationService:
         # -----------------------------------------------------
 
         verified_transaction = (
-            BkashPaymentVerificationService
+            BkashPaymentWebhookVerificationService
             .search_transaction(
                 transaction_id,
             )
@@ -526,7 +526,7 @@ class BkashPaymentVerificationService:
 
         if (
             verified_status
-            != BkashPaymentVerificationService
+            != BkashPaymentWebhookVerificationService
             .COMPLETED_TRANSACTION_STATUS
         ):
 

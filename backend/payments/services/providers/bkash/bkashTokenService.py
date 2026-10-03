@@ -68,7 +68,7 @@ class BkashTokenService:
         
         url = (
             f"{settings.BKASH_BASE_URL}"
-            "/tokenized/checkout/token/grant"
+            "/v2/tokenized-checkout/auth/grant-token"
         )
 
         payload = {
@@ -134,7 +134,7 @@ class BkashTokenService:
 
         url = (
             f"{settings.BKASH_BASE_URL}"
-            "/tokenized/checkout/token/refresh"
+            "/v2/tokenized-checkout/auth/refresh-token"
         )
 
         payload = {

@@ -1,6 +1,8 @@
+from django.db import transaction
 from rest_framework.exceptions import ValidationError
 
 from ..models import Payment, PaymentAttempt
+
 from .providers import (
     BkashPaymentService,
     # NagadPaymentService,
@@ -35,53 +37,55 @@ class OnlinePaymentService:
             )
 
         # ---------------------------------------------------------
-        # Get or Create Payment
+        # Payment Database Setup
         # ---------------------------------------------------------
 
-        payment, created = Payment.objects.get_or_create(
-            order=order,
-            defaults={
-                "method": Payment.Method.ONLINE,
-                "status": Payment.Status.PENDING,
-            },
-        )
+        with transaction.atomic():
 
-        # ---------------------------------------------------------
-        # Validate Payment Method
-        # ---------------------------------------------------------
-
-        if payment.method != Payment.Method.ONLINE:
-            raise ValidationError(
-                {
-                    "payment": (
-                        "This order is not configured "
-                        "for online payment."
-                    )
-                }
+            payment, created = Payment.objects.get_or_create(
+                order=order,
+                defaults={
+                    "method": Payment.Method.ONLINE,
+                    "status": Payment.Status.PENDING,
+                },
             )
 
-        # ---------------------------------------------------------
-        # Check Payment Status
-        # ---------------------------------------------------------
+            # -----------------------------------------------------
+            # Validate Payment Method
+            # -----------------------------------------------------
 
-        if payment.status == Payment.Status.PAID:
-            raise ValidationError(
-                {
-                    "payment": (
-                        "This order has already been paid."
-                    )
-                }
+            if payment.method != Payment.Method.ONLINE:
+                raise ValidationError(
+                    {
+                        "payment": (
+                            "This order is not configured "
+                            "for online payment."
+                        )
+                    }
+                )
+
+            # -----------------------------------------------------
+            # Check Payment Status
+            # -----------------------------------------------------
+
+            if payment.status == Payment.Status.PAID:
+                raise ValidationError(
+                    {
+                        "payment": (
+                            "This order has already been paid."
+                        )
+                    }
+                )
+
+            # -----------------------------------------------------
+            # Create Payment Attempt
+            # -----------------------------------------------------
+
+            payment_attempt = PaymentAttempt.objects.create(
+                payment=payment,
+                provider=provider,
+                status=PaymentAttempt.Status.PENDING,
             )
-
-        # ---------------------------------------------------------
-        # Create Payment Attempt
-        # ---------------------------------------------------------
-
-        payment_attempt = PaymentAttempt.objects.create(
-            payment=payment,
-            provider=provider,
-            status=PaymentAttempt.Status.PENDING,
-        )
 
         # ---------------------------------------------------------
         # Create Provider Payment
@@ -100,7 +104,9 @@ class OnlinePaymentService:
         return {
             "provider": provider,
             "payment_status": payment.status,
-            "payment_url": result["payment_url"],
-            "provider_payment_id": result["provider_payment_id"],
+            # "payment_url": result["payment_url"],
+            # "provider_payment_id": result[
+            #     "provider_payment_id"
+            # ],
+            **result,
         }
-
