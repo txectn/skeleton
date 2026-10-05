@@ -1,8 +1,21 @@
-from unfold.admin import ModelAdmin, TabularInline
+from unfold.admin import ModelAdmin, TabularInline, StackedInline
 from django.contrib import admin
 
 from ..models import Order, OrderItem
-from payments.models import Payment
+from payments.models import Payment, PaymentAttempt
+
+from products.models import Variant
+
+class PaymentAttemptInline(TabularInline):
+    model = PaymentAttempt
+    extra = 0
+
+class PaymentInline(StackedInline):
+    model = Payment
+    extra = 0
+    inlines = (
+        PaymentAttemptInline,
+    )
 
 class OrderItemInline(TabularInline):
     model = OrderItem
@@ -10,6 +23,7 @@ class OrderItemInline(TabularInline):
     can_delete = False
 
     fields = (
+        "id",
         "variant",
         "quantity",
         "unit_price",
@@ -18,17 +32,13 @@ class OrderItemInline(TabularInline):
     )
 
     readonly_fields = (
+        "id",
         "variant",
         "quantity",
         "unit_price",
         "discount",
         "total",
     )
-
-class PaymentInline(TabularInline):
-    model = Payment
-    extra = 0
-
 
 @admin.register(Order)
 class OrderAdmin(ModelAdmin):
