@@ -1,115 +1,151 @@
-import requests
+import logging
 
-from django.conf import settings
-from django.core.cache import cache
 from rest_framework.exceptions import ValidationError
 
+from .bkashPaymentExecutionService import (
+    BkashPaymentExecutionService,
+)
+from .bkashPaymentQueryService import (
+    BkashPaymentQueryService,
+)
+
+logger = logging.getLogger(__name__)
+
 class BkashPaymentReconciliationService:
-    """Handles bKash payment reconciliation through Query Payment."""
+    """
+    Handles recovery of unresolved bKash payments.
 
-    TOKEN_CACHE_KEY = "bkash_access_token"
-    TOKEN_CACHE_TIMEOUT = 3300
+    Flow:
 
-    QUERY_PAYMENT_PATH = (
-        "/v2/tokenized-checkout/query/payment"
+        1. Try Execute Payment.
+        2. If Execute succeeds:
+               return success.
+        3. If Execute is inconclusive:
+               Query Payment.
+        4. If Query says Completed:
+               return success.
+        5. If Query says Initiated:
+               return pending.
+        6. If Query says a terminal failure status:
+               return failed.
+
+    This service does NOT update PaymentAttempt, Payment,
+    or Order. Database state changes are handled by
+    PaymentReconciliationService.
+    """
+
+    PROVIDER = "bkash"
+
+    COMPLETED_STATUS = "Completed"
+    INITIATED_STATUS = "Initiated"
+
+    # Add confirmed bKash terminal failure statuses here.
+    FAILED_STATUSES = (
+        # "Failed",
+        # "Cancelled",
     )
 
-    @staticmethod
-    def can_handle(provider):
-        return provider == "bkash"
+    @classmethod
+    def can_handle(cls, provider):
+        return provider == cls.PROVIDER
 
-    @staticmethod
-    def get_access_token():
-        access_token = cache.get(
-            BkashPaymentReconciliationService.TOKEN_CACHE_KEY,
+    @classmethod
+    def reconcile(cls, payment_attempt):
+
+        # ---------------------------------------------------------
+        # Validate Payment Attempt
+        # ---------------------------------------------------------
+
+        cls._validate_payment_attempt(
+            payment_attempt
         )
 
-        if access_token:
-            return access_token
-
-        url = (
-            f"{settings.BKASH_BASE_URL}"
-            "/tokenized/checkout/token/grant"
+        payment_id = (
+            payment_attempt.provider_payment_id
         )
 
-        headers = {
-            "Content-Type": "application/json",
-            "Accept": "application/json",
-            "username": settings.BKASH_USERNAME,
-            "password": settings.BKASH_PASSWORD,
-        }
-
-        data = {
-            "app_key": settings.BKASH_APP_KEY,
-            "app_secret": settings.BKASH_APP_SECRET,
-        }
+        # ---------------------------------------------------------
+        # Execute Payment First
+        # ---------------------------------------------------------
 
         try:
-            response = requests.post(
-                url,
-                headers=headers,
-                json=data,
-                timeout=30,
-            )
-        except requests.RequestException:
-            raise ValidationError(
-                {
-                    "payment": (
-                        "Unable to connect to bKash."
-                    )
-                }
+            execution_result = (
+                BkashPaymentExecutionService.execute_payment(
+                    payment_id=payment_id,
+                )
             )
 
-        try:
-            result = response.json()
-        except ValueError:
-            raise ValidationError(
-                {
-                    "payment": (
-                        "Invalid authentication response "
-                        "received from bKash."
-                    )
-                }
+        except ValidationError as exc:
+
+            logger.warning(
+                "bKash payment execution was not conclusive. "
+                "payment_id=%s error=%s",
+                payment_id,
+                exc.detail,
             )
 
-        if not response.ok:
-            raise ValidationError(
-                {
-                    "payment": (
-                        "Unable to authenticate with bKash."
-                    )
-                }
+            execution_result = None
+
+        # ---------------------------------------------------------
+        # Execute Successful
+        # ---------------------------------------------------------
+
+        if execution_result is not None:
+
+            return cls._build_success_result(
+                execution_result
             )
 
-        access_token = result.get("id_token")
+        # ---------------------------------------------------------
+        # Execute Was Not Conclusive
+        # ---------------------------------------------------------
+        #
+        # We cannot assume the payment failed.
+        #
+        # Execute may have reached bKash even if our application
+        # received a timeout or an error response.
+        #
+        # Therefore query the provider for the actual state.
+        # ---------------------------------------------------------
 
-        if not access_token:
-            raise ValidationError(
-                {
-                    "payment": (
-                        "bKash authentication failed."
-                    )
-                }
-            )
-
-        cache.set(
-            BkashPaymentReconciliationService.TOKEN_CACHE_KEY,
-            access_token,
-            BkashPaymentReconciliationService.TOKEN_CACHE_TIMEOUT,
+        return cls._query_payment(
+            payment_id=payment_id,
         )
 
-        return access_token
+    # =============================================================
+    # Validation
+    # =============================================================
 
-    @staticmethod
-    def reconcile(payment_attempt):
-        """
-        Query bKash for the current state of a payment.
+    @classmethod
+    def _validate_payment_attempt(
+        cls,
+        payment_attempt,
+    ):
+        if payment_attempt is None:
+            raise ValidationError(
+                {
+                    "payment": (
+                        "Payment attempt is required."
+                    )
+                }
+            )
 
-        This is primarily used when Execute Payment times out
-        or when the local payment state is uncertain.
-        """
+        if payment_attempt.provider != cls.PROVIDER:
+            raise ValidationError(
+                {
+                    "payment": (
+                        "The payment attempt does not "
+                        "belong to bKash."
+                    ),
+                    "provider": (
+                        payment_attempt.provider
+                    ),
+                }
+            )
 
-        payment_id = payment_attempt.provider_payment_id
+        payment_id = (
+            payment_attempt.provider_payment_id
+        )
 
         if not payment_id:
             raise ValidationError(
@@ -120,92 +156,151 @@ class BkashPaymentReconciliationService:
                 }
             )
 
-        access_token = (
-            BkashPaymentReconciliationService.get_access_token()
+        payment = payment_attempt.payment
+
+        if payment.status != payment.Status.PENDING:
+            raise ValidationError(
+                {
+                    "payment": (
+                        "The payment is not pending."
+                    ),
+                    "payment_status": payment.status,
+                }
+            )
+
+        if (
+            payment_attempt.status
+            != payment_attempt.Status.PENDING
+        ):
+            raise ValidationError(
+                {
+                    "payment": (
+                        "The payment attempt is not pending."
+                    ),
+                    "payment_attempt_status": (
+                        payment_attempt.status
+                    ),
+                }
+            )
+
+    # =============================================================
+    # Execute Result
+    # =============================================================
+
+    @classmethod
+    def _build_success_result(
+        cls,
+        result,
+    ):
+        transaction_id = result.get(
+            "trx_id"
         )
 
-        url = (
-            f"{settings.BKASH_BASE_URL}"
-            f"{BkashPaymentReconciliationService.QUERY_PAYMENT_PATH}"
+        if not transaction_id:
+            raise ValidationError(
+                {
+                    "payment": (
+                        "bKash execution completed but "
+                        "no transaction ID was returned."
+                    )
+                }
+            )
+
+        return {
+            "status": "success",
+            "transaction_id": transaction_id,
+            "provider_response": result,
+        }
+
+    # =============================================================
+    # Query Fallback
+    # =============================================================
+
+    @classmethod
+    def _query_payment(
+        cls,
+        payment_id,
+    ):
+        result = (
+            BkashPaymentQueryService.query_payment(
+                payment_id=payment_id,
+            )
         )
-
-        headers = {
-            "Content-Type": "application/json",
-            "Accept": "application/json",
-            "Authorization": access_token,
-            "X-APP-Key": settings.BKASH_APP_KEY,
-        }
-
-        data = {
-            "paymentId": payment_id,
-        }
-
-        try:
-            response = requests.post(
-                url,
-                headers=headers,
-                json=data,
-                timeout=30,
-            )
-        except requests.RequestException:
-            raise ValidationError(
-                {
-                    "payment": (
-                        "Unable to connect to bKash "
-                        "for payment reconciliation."
-                    )
-                }
-            )
-
-        try:
-            result = response.json()
-        except ValueError:
-            raise ValidationError(
-                {
-                    "payment": (
-                        "Invalid payment query response "
-                        "received from bKash."
-                    )
-                }
-            )
-
-        if not response.ok:
-            raise ValidationError(
-                {
-                    "payment": (
-                        result.get(
-                            "errorMessageEn",
-                            "Unable to retrieve "
-                            "bKash payment status.",
-                        )
-                    )
-                }
-            )
 
         transaction_status = result.get(
-            "transactionStatus",
+            "transaction_status"
         )
 
         transaction_id = result.get(
-            "trxId",
+            "trx_id"
         )
 
-        if transaction_status == "Completed":
+        # ---------------------------------------------------------
+        # Completed
+        # ---------------------------------------------------------
+
+        if transaction_status == cls.COMPLETED_STATUS:
+
+            if not transaction_id:
+                raise ValidationError(
+                    {
+                        "payment": (
+                            "bKash reported the payment as "
+                            "completed but did not return "
+                            "a transaction ID."
+                        ),
+                        "payment_id": payment_id,
+                    }
+                )
+
             return {
                 "status": "success",
                 "transaction_id": transaction_id,
                 "provider_response": result,
             }
 
-        if transaction_status == "Initiated":
+        # ---------------------------------------------------------
+        # Still Initiated
+        # ---------------------------------------------------------
+
+        if transaction_status == cls.INITIATED_STATUS:
+
             return {
                 "status": "pending",
                 "transaction_id": transaction_id,
                 "provider_response": result,
             }
 
-        return {
-            "status": "pending",
-            "transaction_id": transaction_id,
-            "provider_response": result,
-        }
+        # ---------------------------------------------------------
+        # Terminal Failure
+        # ---------------------------------------------------------
+
+        if transaction_status in cls.FAILED_STATUSES:
+
+            return {
+                "status": "failed",
+                "transaction_id": transaction_id,
+                "provider_response": result,
+            }
+
+        # ---------------------------------------------------------
+        # Unknown Status
+        # ---------------------------------------------------------
+
+        logger.error(
+            "bKash returned an unexpected transaction status "
+            "during reconciliation. payment_id=%s status=%s",
+            payment_id,
+            transaction_status,
+        )
+
+        raise ValidationError(
+            {
+                "payment": (
+                    "bKash returned an unknown "
+                    "transaction status."
+                ),
+                "payment_id": payment_id,
+                "transaction_status": transaction_status,
+            }
+        )

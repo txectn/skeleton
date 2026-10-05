@@ -1,6 +1,7 @@
 from django.db import transaction
 from rest_framework.exceptions import ValidationError
 
+from ....models import PaymentAttempt
 from .bkashPaymentExecutionService import (
     BkashPaymentExecutionService,
 )
@@ -14,7 +15,10 @@ class BkashPaymentVerificationService:
         payment_id = data["paymentID"]
         callback_status = data["status"]
 
-        # Callback Validation
+        # ---------------------------------------------------------
+        # Validate Callback
+        # ---------------------------------------------------------
+
         if callback_status != "success":
             raise ValidationError(
                 {
@@ -25,17 +29,41 @@ class BkashPaymentVerificationService:
                 }
             )
 
-        # Execute Payment
-        result = BkashPaymentExecutionService.execute_payment(
-            user=user,
-            payment_id=payment_id,
-        )
+        # ---------------------------------------------------------
+        # Find Payment Attempt
+        # ---------------------------------------------------------
 
-        payment_attempt = result["payment_attempt"]
-        payment = result["payment"]
-        order = result["order"]
+        try:
+            payment_attempt = (
+                PaymentAttempt.objects
+                .select_related(
+                    "payment",
+                    "payment__order",
+                )
+                .get(
+                    provider_payment_id=payment_id,
+                    provider="bkash",
+                    payment__order__user=user,
+                )
+            )
 
-        # Already Paid
+        except PaymentAttempt.DoesNotExist:
+            raise ValidationError(
+                {
+                    "message": (
+                        "No bKash payment attempt was found."
+                    ),
+                    "provider_payment_id": payment_id,
+                }
+            )
+
+        payment = payment_attempt.payment
+        order = payment.order
+
+        # ---------------------------------------------------------
+        # Validate Current Payment State
+        # ---------------------------------------------------------
+
         if payment.status == payment.Status.PAID:
             return {
                 "message": "Payment has already been completed.",
@@ -43,11 +71,7 @@ class BkashPaymentVerificationService:
                 "order_status": order.status,
             }
 
-        # Invalid Attempt State
-        if (
-            payment_attempt.status
-            == payment_attempt.Status.PAID
-        ):
+        if payment_attempt.status == payment_attempt.Status.PAID:
             return {
                 "message": (
                     "Payment attempt has already been completed."
@@ -56,10 +80,7 @@ class BkashPaymentVerificationService:
                 "order_status": order.status,
             }
 
-        if (
-            payment_attempt.status
-            == payment_attempt.Status.FAILED
-        ):
+        if payment_attempt.status == payment_attempt.Status.FAILED:
             raise ValidationError(
                 {
                     "payment": (
@@ -68,8 +89,69 @@ class BkashPaymentVerificationService:
                 }
             )
 
+        # ---------------------------------------------------------
+        # Execute Payment With bKash
+        # ---------------------------------------------------------
+
+        result = BkashPaymentExecutionService.execute_payment(
+            payment_id=payment_id,
+        )
+
+        # ---------------------------------------------------------
         # Save Payment State
+        # ---------------------------------------------------------
+
         with transaction.atomic():
+
+            # Re-fetch with locks because another verification
+            # request could have completed the payment while the
+            # bKash API request was running.
+
+            payment_attempt = (
+                PaymentAttempt.objects
+                .select_for_update()
+                .select_related(
+                    "payment",
+                    "payment__order",
+                )
+                .get(
+                    pk=payment_attempt.pk,
+                )
+            )
+
+            payment = payment_attempt.payment
+            order = payment.order
+
+            # Another request may have completed it while we
+            # were waiting for bKash.
+
+            if payment.status == payment.Status.PAID:
+                return {
+                    "message": "Payment has already been completed.",
+                    "payment_status": payment.status,
+                    "order_status": order.status,
+                }
+
+            if payment_attempt.status == payment_attempt.Status.PAID:
+                return {
+                    "message": (
+                        "Payment attempt has already been completed."
+                    ),
+                    "payment_status": payment.status,
+                    "order_status": order.status,
+                }
+
+            if (
+                payment_attempt.status
+                == payment_attempt.Status.FAILED
+            ):
+                raise ValidationError(
+                    {
+                        "payment": (
+                            "This payment attempt has already failed."
+                        )
+                    }
+                )
 
             payment_attempt.status = (
                 payment_attempt.Status.PAID
@@ -99,6 +181,10 @@ class BkashPaymentVerificationService:
                     "updated_at",
                 ]
             )
+
+        # ---------------------------------------------------------
+        # Success
+        # ---------------------------------------------------------
 
         return {
             "message": "Payment completed successfully.",

@@ -474,3 +474,83 @@ You understand why it happens.
    └── Variants
          ├── Options
          └── Inventory
+
+
+
+
+if order (is not each one (pending, processing, confirmed)){
+   raise error "Cant change payment method"
+}
+
+if payment(is paid or failed){
+   raise error "Cant change payment method"
+}
+ 
+if payment_attempt exist and payment_attempt(is not pending) {
+   raise error "Cant change payment method"
+}
+
+if payment_method == "cod" {
+   change payment method + call online payment service(order, provider is attribute)
+}
+
+if payment_method != "cod" {
+   if changing to cod{
+      change payment method + mark payemnt attempt as failed + call cod payment service (order is attribute)
+   }
+   mark paymetn attempt as failed + call online payment service(order, provider is attribute)
+}
+
+
+
+CHANGE PAYMENT METHOD
+
+if order is NOT one of:
+    - pending
+    - processing
+    - confirmed
+
+    → raise "Cannot change payment method"
+
+
+if payment is PAID or FAILED
+
+    → raise "Cannot change payment method"
+
+
+if payment_attempt exists
+and payment_attempt is NOT PENDING
+
+    → raise "Cannot change payment method"
+
+
+if payment_method == "cod"
+
+    → if payment_attempt exists:
+          mark payment_attempt as FAILED
+
+    → change payment method to COD
+
+    → call CodPaymentService(order)
+
+    → return payment-related data to frontend
+
+
+if payment_method != "cod"
+
+    → if payment_attempt exists:
+          mark payment_attempt as FAILED
+
+    → change payment method to ONLINE
+
+    → call OnlinePaymentService(
+          order,
+          provider
+      )
+
+    → return payment-related data to frontend
+
+
+
+
+

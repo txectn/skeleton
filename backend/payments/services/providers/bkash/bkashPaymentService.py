@@ -48,7 +48,7 @@ class BkashPaymentService:
 
         raise ValidationError(
             {
-                "payment": message,
+                "message": message,
             }
         )
 

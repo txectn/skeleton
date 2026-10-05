@@ -30,7 +30,7 @@ class OnlinePaymentService:
         else:
             raise ValidationError(
                 {
-                    "provider": (
+                    "message": (
                         "Unsupported payment provider."
                     )
                 }
@@ -57,7 +57,7 @@ class OnlinePaymentService:
             if payment.method != Payment.Method.ONLINE:
                 raise ValidationError(
                     {
-                        "payment": (
+                        "message": (
                             "This order is not configured "
                             "for online payment."
                         )
@@ -71,7 +71,7 @@ class OnlinePaymentService:
             if payment.status == Payment.Status.PAID:
                 raise ValidationError(
                     {
-                        "payment": (
+                        "message": (
                             "This order has already been paid."
                         )
                     }

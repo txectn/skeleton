@@ -10,7 +10,7 @@ class BkashPaymentQueryService:
     """Handles bKash payment status queries."""
 
     QUERY_PAYMENT_PATH = (
-        "/v2/tokenized-checkout/query/payment"
+        "/v2/tokenized-checkout/payment/status"
     )
 
     @staticmethod
@@ -23,7 +23,6 @@ class BkashPaymentQueryService:
     @classmethod
     def query_payment(
         cls,
-        user,
         payment_id,
     ):
         # ---------------------------------------------------------
@@ -40,14 +39,13 @@ class BkashPaymentQueryService:
                 .get(
                     provider_payment_id=payment_id,
                     provider="bkash",
-                    payment__order__user=user,
                 )
             )
 
         except PaymentAttempt.DoesNotExist:
             raise ValidationError(
                 {
-                    "payment": (
+                    "message": (
                         "The bKash payment could not be found."
                     )
                 }
@@ -68,7 +66,7 @@ class BkashPaymentQueryService:
         except Exception:
             raise ValidationError(
                 {
-                    "payment": (
+                    "message": (
                         "Unable to authenticate with bKash."
                     )
                 }
@@ -115,7 +113,7 @@ class BkashPaymentQueryService:
         except requests.Timeout:
             raise ValidationError(
                 {
-                    "payment": (
+                    "message": (
                         "The bKash payment query timed out."
                     ),
                     "payment_id": payment_id,
@@ -126,7 +124,7 @@ class BkashPaymentQueryService:
         except requests.RequestException:
             raise ValidationError(
                 {
-                    "payment": (
+                    "message": (
                         "Unable to connect to bKash."
                     )
                 }
@@ -142,7 +140,7 @@ class BkashPaymentQueryService:
         except ValueError:
             raise ValidationError(
                 {
-                    "payment": (
+                    "message": (
                         "Invalid response received from bKash."
                     )
                 }
@@ -170,7 +168,9 @@ class BkashPaymentQueryService:
 
             raise ValidationError(
                 {
-                    "payment": error_message,
+                    "message": error_message,
+                    "payment_id": payment_id,
+                    "external_code": external_code,
                 }
             )
 
@@ -185,9 +185,13 @@ class BkashPaymentQueryService:
         if response_payment_id != payment_id:
             raise ValidationError(
                 {
-                    "payment": (
+                    "message": (
                         "The bKash payment ID does not match."
-                    )
+                    ),
+                    "payment_id": payment_id,
+                    "response_payment_id": (
+                        response_payment_id
+                    ),
                 }
             )
 
@@ -199,19 +203,14 @@ class BkashPaymentQueryService:
             "transactionStatus"
         )
 
-        if transaction_status not in (
-            "Completed",
-            "Initiated",
-        ):
+        if not transaction_status:
             raise ValidationError(
                 {
-                    "payment": (
-                        "bKash returned an unknown "
+                    "message": (
+                        "bKash did not return a "
                         "transaction status."
                     ),
-                    "transaction_status": (
-                        transaction_status
-                    ),
+                    "payment_id": payment_id,
                 }
             )
 
@@ -224,9 +223,15 @@ class BkashPaymentQueryService:
             "payment": payment,
             "order": order,
             "payment_id": response_payment_id,
-            "trx_id": result.get("trxId"),
-            "amount": result.get("amount"),
-            "currency": result.get("currency"),
+            "trx_id": result.get(
+                "trxId"
+            ),
+            "amount": result.get(
+                "amount"
+            ),
+            "currency": result.get(
+                "currency"
+            ),
             "transaction_status": transaction_status,
             "verification_status": result.get(
                 "verificationStatus"

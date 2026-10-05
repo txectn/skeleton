@@ -23,13 +23,12 @@ class BkashPaymentExecutionService:
     @classmethod
     def execute_payment(
         cls,
-        user,
         payment_id,
     ):
         # ---------------------------------------------------------
         # Find Payment Attempt
         # ---------------------------------------------------------
-
+        
         try:
             payment_attempt = (
                 PaymentAttempt.objects
@@ -40,16 +39,16 @@ class BkashPaymentExecutionService:
                 .get(
                     provider_payment_id=payment_id,
                     provider="bkash",
-                    payment__order__user=user,
                 )
             )
 
-        except PaymentAttempt.DoesNotExist:
+        except:
             raise ValidationError(
                 {
-                    "payment": (
-                        "The bKash payment could not be found."
-                    )
+                    "message": (
+                        "bKash payment attempt was not found."
+                    ),
+                    "provider_payment_id": payment_id,
                 }
             )
 

@@ -20,7 +20,7 @@ class PaymentService:
         if order.user_id != user.id:
             raise ValidationError(
                 {
-                    "order": "This order does not belong to you."
+                    "message": "This order does not belong to you.",
                 }
             )
 
