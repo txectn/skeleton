@@ -228,6 +228,8 @@ import RequireAuth from "../../context/auth/RequireAuth";
 
 import { useAuth } from "../../context/auth/AuthProvider";
 
+import Button from '@mui/material/Button';
+
 export default function Home() {
 
     const { logout } = useAuth();
@@ -316,9 +318,9 @@ export default function Home() {
         return () => clearTimeout(timer);
     }, [isFetching]);
 
-    if (showLoader) {
-        return <h1>Loading...</h1>;
-    }
+    // if (showLoader) {
+    //     return <h1>Loading...</h1>;
+    // }
 
 
     const handleGoogleLogin = () => {
@@ -356,6 +358,20 @@ export default function Home() {
             </Link>
 
             <br />
+            <Button
+                variant="contained"
+                sx={{
+                    backgroundColor: "black",
+                    color: "white",
+                    "&:hover": {
+                        backgroundColor: "#333",
+                    },
+                    fontSize: "1.4rem",
+                }}
+                onClick={logout}
+            >
+                Logout
+            </Button>
             <br />
 
             <button onClick={handleGoogleLogin}>

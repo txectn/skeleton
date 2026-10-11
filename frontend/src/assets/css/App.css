@@ -1,5 +1,5 @@
 /* 1. Register the variable font */
-font-face {
+@font-face {
   font-family: "Inter";
   src: url("../fonts/InterVariable.woff2") format("woff2");
   font-weight: 100 900;
@@ -18,6 +18,11 @@ font-face {
 	--bg-inverse: #000000;
 	--bg-hover: #eff0f2;
 	--bg-hover2: rgb(255, 57, 39);
+	--bg-hover-mui-20: rgba(255, 255, 255, 0.25);
+	--bg-hover-mui-30: rgba(255, 255, 255, 0.3);
+
+	--glass: rgba(255, 255, 255, 0.62);
+	--glass-strong: rgba(255, 255, 255, 0.86);
 
 	--text-main: #000000;
 	--text-muted-100: #4E5562;

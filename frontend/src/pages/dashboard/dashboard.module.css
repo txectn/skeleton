@@ -1,0 +1,113 @@
+
+/* layout */
+.Layout {
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* global */
+.transition{
+    transition: all 0.2s ease-in-out;
+}
+
+.iconsStyles{
+    width: 2.5rem !important;
+    height: 2.5rem !important;
+    color: var(--text-inverse) !important;
+}
+
+/* header */
+.header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+}
+
+.headerOpen{
+    padding-left: 240px;
+}
+
+.headerNav{
+    background-color: var(--bg-inverse);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+}
+
+.headerLeft{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    width: 80px;
+}
+
+.headerLeftOpen{
+    display: none;
+}
+
+.menuButton svg{
+    display: none;
+}
+
+@media(pointer: fine) {
+    .menuButton:hover svg{
+        display: block;
+    }
+    .menuButton:hover img{
+        display: none;
+    }
+}
+
+/* .headerCenter{
+} */
+
+.logo{
+    color: var(--text-inverse) !important;
+    font-size: var(--fs-lg) !important;
+    font-weight: var(--fw-semibold) !important;
+}
+
+.headerCenterOpen{
+    display: none;
+}
+
+.headerRight{
+    flex: 3;
+}
+
+/* sidebar */
+.drawer {
+    flex: 0 0 80px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.drawerOpen{
+    flex: 0 0 240px;
+    position: relative;
+    z-index: 101;
+}
+
+.drawerHeader{
+    height: 64px;
+    width: 100%;
+    background-color: var(--bg-inverse);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-right: 0;
+}
+
+/* main */
+.main {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    padding-top: 64px;
+}

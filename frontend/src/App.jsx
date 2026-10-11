@@ -9,6 +9,9 @@ import GoogleCallback from "./pages/callback"
 import FacebookCallback from "./pages/callback2"
 import CartTest from "./pages/x"
 
+import Dashboard from "./pages/dashboard/dashboard"
+import { DASHBOARD_ENDPOINT } from "./config"
+
 export default function App() {
   return (
     <>
@@ -23,6 +26,13 @@ export default function App() {
         <Route path="/auth/google/callback" element={<GoogleCallback />} />
         <Route path="/auth/facebook/callback" element={<FacebookCallback />} />
         <Route path="/cart" element={<CartTest />} />
+
+        <Route path={DASHBOARD_ENDPOINT} element={<Dashboard />}>
+           <Route index element={<div>Dashboard</div>} />
+           <Route path="accounts" element={<div>accounts</div>} />
+           <Route path="products" element={<div>products</div>} />
+           <Route path="orders" element={<div>orders</div>} />
+        </Route>
       </Routes>
     </>
   )

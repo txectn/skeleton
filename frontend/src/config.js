@@ -1,6 +1,9 @@
 // Base URL
 export const BASE_URL = import.meta.env.VITE_BASE_URL;
 
+// Dashboard Endpoint
+export const DASHBOARD_ENDPOINT = import.meta.env.VITE_DASHBOARD_ENDPOINT || "/dashboard";
+
 // Access token
 export const ACCESS_TOKEN = "access_token";
 
