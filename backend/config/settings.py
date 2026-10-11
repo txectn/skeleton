@@ -66,6 +66,7 @@ INSTALLED_APPS = [
     "promotions",
     "orders",
     "payments",
+    "returns",
     "dashboard",
     "siteConfig",
 ]
