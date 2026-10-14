@@ -1,10 +1,10 @@
 /* 1. Register the variable font */
 @font-face {
-  font-family: "Inter";
-  src: url("../fonts/InterVariable.woff2") format("woff2");
-  font-weight: 100 900;
-  font-style: normal;
-  font-display: swap;
+	font-family: "Inter";
+	src: url("../fonts/InterVariable.woff2") format("woff2");
+	font-weight: 100 900;
+	font-style: normal;
+	font-display: swap;
 }
 
 :root {
@@ -18,11 +18,17 @@
 	--bg-inverse: #000000;
 	--bg-hover: #eff0f2;
 	--bg-hover2: rgb(255, 57, 39);
-	--bg-hover-mui-20: rgba(255, 255, 255, 0.25);
-	--bg-hover-mui-30: rgba(255, 255, 255, 0.3);
+	--bg-hover-mui-main: rgba(0, 0, 0, 0.04);
+	--bg-hover-mui-ripple: rgba(0, 0, 0, 0.3);
+	--bg-hover-mui-inverse: rgba(255, 255, 255, 0.3);
+	--bg-hover-mui-ripple-inverse: rgba(255, 255, 255, 0.4);
 
 	--glass: rgba(255, 255, 255, 0.62);
 	--glass-strong: rgba(255, 255, 255, 0.86);
+	--border-color-glass: rgba(14,19,16,.14);
+	--shadow-glass: inset 0 1px 0 rgba(255,255,255,.85),0 14px 34px -22px rgba(14,19,16,.16);
+	--filter-glass: blur(14px) saturate(1.5);
+	/* -webkit-backdrop-filter: var(--filter-glass); */
 
 	--text-main: #000000;
 	--text-muted-100: #4E5562;
@@ -32,8 +38,10 @@
 	--shadow-80: rgba(0, 0, 0, 0.1);
 	--shadow-90: rgba(0, 0, 0, 0.2);
 	--shadow-100: rgba(0, 0, 0, 0.3);
+	--shadow-mui: 0px 5px 5px -3px rgba(0,0,0,0.2),0px 8px 10px 1px rgba(0,0,0,0.14),0px 3px 14px 2px rgba(0,0,0,0.12);
 
 	--border-main: #e2e8f0;
+	--border-main-70: #cbd5e1;
 	--border-surface: #ffffff;
 	--border-element: #94a3b8;
 	--border-inverse: #000000;
@@ -48,6 +56,7 @@
 	/* Font Size */
 	--fs-xs: 1.2rem;
 	--fs-sm: 1.4rem;
+	--fs-sm-md: 1.5rem;
 	--fs-base: 1.6rem;
 	--fs-md: 1.8rem;
 	--fs-lg: 2.0rem;

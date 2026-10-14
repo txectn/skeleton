@@ -1,0 +1,54 @@
+
+.container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.parent {
+    position: relative;
+    width: 100%;
+}
+
+.btn {
+    text-align: left;
+}
+
+.parentIcon {
+    flex-shrink: 0;
+    margin-right: 15px;
+}
+
+.childIcon {
+    flex-shrink: 0;
+    margin-right: 12px;
+}
+
+.popupIcon {
+    flex-shrink: 0;
+    margin-right: 10px;
+}
+
+/* Expanded sidebar tree */
+.menu {
+    max-height: 0;
+    overflow: hidden;
+    margin-left: 37px;
+    border-left: 1px solid var(--border-main-70);
+    opacity: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    transition:
+        max-height 0.35s ease,
+        opacity 0.25s ease;
+}
+
+.menuOpen {
+    max-height: 1000px;
+    opacity: 1;
+}
+
+.menuItem {
+    min-height: 44px;
+}

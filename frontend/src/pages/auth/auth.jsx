@@ -4,7 +4,7 @@ export default function Auth() {
     return (
         <div>
             <h1>Auth</h1>
-            <Link to="/">Home</Link>
+            <Link to="/">Login</Link>
         </div>
     )
 }

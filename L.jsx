@@ -554,3 +554,48 @@ if payment_method != "cod"
 
 
 
+
+
+
+
+
+
+
+
+
+### What is Medusa?
+
+Medusa is a framework for building e-commerce applications. It provides a backend that includes core e-commerce business functionality out of the box.
+
+For example, Medusa provides functionality for products, orders, payments, authentication, customers, carts, and other e-commerce-related features.
+
+Today, we are going to build an e-commerce backend with Medusa.
+
+### Installation
+
+#### Requirements
+1. Node.js
+2. Docker
+3. Docker Compose
+4. Git
+
+#### Steps
+1. Install Node.js.
+2. Install Docker.
+3. Install Docker Compose.
+4. Install Git.
+
+### Create a Medusa Project
+Since we are going to run Medusa with Docker, we will use the Docker-based Medusa setup instead of the standard `create-medusa-app` installation.
+
+First, clone the Medusa DTC Starter repository:
+
+```bash
+git clone https://github.com/medusajs/dtc-starter.git --depth=1 my-medusa-store
+```
+
+Then, move into the project directory:
+
+```bash
+cd my-medusa-store
+```

@@ -224,7 +224,6 @@ import { useApiQuery } from "../../hooks/queries/useApiQuery";
 import { useApiMutation } from "../../hooks/mutations/useApiMutation";
 import { useIsFetching } from "@tanstack/react-query";
 import { useQueryClient } from "@tanstack/react-query";
-import RequireAuth from "../../context/auth/RequireAuth";
 
 import { useAuth } from "../../context/auth/AuthProvider";
 
@@ -233,6 +232,8 @@ import Button from '@mui/material/Button';
 export default function Home() {
 
     const { logout } = useAuth();
+
+    const { isAuthenticated } = useAuth();
 
     const [id, setId] = useState(1);
 
@@ -351,8 +352,7 @@ export default function Home() {
 
     return (
         <div>
-            <h1>Home without auth</h1>
-            <RequireAuth><h1>Home with auth</h1></RequireAuth>
+            {isAuthenticated ? <h1>Authenticated</h1> : <h1>Not authenticated</h1>}
             <Link to="/login">
                 Login
             </Link>

@@ -11,6 +11,7 @@ import CartTest from "./pages/x"
 
 import Dashboard from "./pages/dashboard/dashboard"
 import { DASHBOARD_ENDPOINT } from "./config"
+import RequireAuth from "./context/auth/RequireAuth"
 
 export default function App() {
   return (
@@ -27,7 +28,7 @@ export default function App() {
         <Route path="/auth/facebook/callback" element={<FacebookCallback />} />
         <Route path="/cart" element={<CartTest />} />
 
-        <Route path={DASHBOARD_ENDPOINT} element={<Dashboard />}>
+        <Route path={DASHBOARD_ENDPOINT} element={<RequireAuth><Dashboard /></RequireAuth>}>
            <Route index element={<div>Dashboard</div>} />
            <Route path="accounts" element={<div>accounts</div>} />
            <Route path="products" element={<div>products</div>} />
