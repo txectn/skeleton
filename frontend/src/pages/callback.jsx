@@ -93,11 +93,16 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { ACCESS_TOKEN, REFRESH_TOKEN } from "../config";
+import { useAuth } from "../context/auth/AuthProvider";
 
 export default function GoogleCallback() {
     const [responseData, setResponseData] = useState(
         "Completing Google login..."
     );
+
+    const { login, isAuthenticated } = useAuth();
+
+    console.log("isAuthenticated:", isAuthenticated);
 
     useEffect(() => {
         const authenticate = async () => {
@@ -144,6 +149,8 @@ export default function GoogleCallback() {
                     REFRESH_TOKEN,
                     response.data.tokens.refresh
                 );
+
+                login();
 
                 setResponseData(
                     JSON.stringify(response.data, null, 4)

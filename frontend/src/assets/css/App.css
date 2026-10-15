@@ -18,6 +18,10 @@
 	--bg-inverse: #000000;
 	--bg-hover: #eff0f2;
 	--bg-hover2: rgb(255, 57, 39);
+
+	--bg-skeleton-main: rgba(0, 0, 0, 0.11);
+	--bg-skeleton-inverse: rgba(255, 255, 255, 0.13);
+
 	--bg-hover-mui-main: rgba(0, 0, 0, 0.04);
 	--bg-hover-mui-ripple: rgba(0, 0, 0, 0.3);
 	--bg-hover-mui-inverse: rgba(255, 255, 255, 0.3);
@@ -25,8 +29,8 @@
 
 	--glass: rgba(255, 255, 255, 0.62);
 	--glass-strong: rgba(255, 255, 255, 0.86);
-	--border-color-glass: rgba(14,19,16,.14);
-	--shadow-glass: inset 0 1px 0 rgba(255,255,255,.85),0 14px 34px -22px rgba(14,19,16,.16);
+	--border-color-glass: rgba(14, 19, 16, .14);
+	--shadow-glass: inset 0 1px 0 rgba(255, 255, 255, .85), 0 14px 34px -22px rgba(14, 19, 16, .16);
 	--filter-glass: blur(14px) saturate(1.5);
 	/* -webkit-backdrop-filter: var(--filter-glass); */
 
@@ -38,13 +42,15 @@
 	--shadow-80: rgba(0, 0, 0, 0.1);
 	--shadow-90: rgba(0, 0, 0, 0.2);
 	--shadow-100: rgba(0, 0, 0, 0.3);
-	--shadow-mui: 0px 5px 5px -3px rgba(0,0,0,0.2),0px 8px 10px 1px rgba(0,0,0,0.14),0px 3px 14px 2px rgba(0,0,0,0.12);
+
+	--shadow-mui: 0px 5px 5px -3px rgba(0, 0, 0, 0.2), 0px 8px 10px 1px rgba(0, 0, 0, 0.14), 0px 3px 14px 2px rgba(0, 0, 0, 0.12);
 
 	--border-main: #e2e8f0;
-	--border-main-70: #cbd5e1;
 	--border-surface: #ffffff;
 	--border-element: #94a3b8;
-	--border-inverse: #000000;
+	--border-inverse: #776a6a;
+
+	--border-main-70: #cbd5e1;
 
 	--brand-primary: #2563eb;
 	--status-error: #dc2626;
@@ -182,29 +188,32 @@
 /* underline util */
 .underline {
 	position: relative;
-	transition: width 0.3s ease;
-	display: flex;
-	align-items: center;
-	justify-content: center;
+	text-decoration: none;
 }
 
 .underline::after {
 	content: "";
 	position: absolute;
 	left: 0;
-	bottom: -0.5rem;
-	width: 0;
+	bottom: 0;
+	width: 100%;
 	height: 1px;
-	background-color: var(--bg-inverse);
-	transition: width 0.3s ease;
+	background-color: var(--text-main);
+	transform: scaleX(0);
+	transform-origin: right;
+	transition: transform 250ms ease;
 }
 
-@media(hover: hover) {
+@media(pointer: fine) {
 	.underline:hover::after {
-		width: 100%;
+		transform: scaleX(1);
+		transform-origin: left;
 	}
 }
 
-.underline-active::after {
-	width: 100%;
+@media(pointer: coarse) {
+	.underline:active::after {
+		transform: scaleX(1);
+		transform-origin: left;
+	}
 }

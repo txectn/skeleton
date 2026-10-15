@@ -82,6 +82,9 @@ export default function DashboardprofileAction() {
         }
     };
 
+    console.log("access token:", localStorage.getItem(ACCESS_TOKEN));
+    console.log("refresh token:", localStorage.getItem(REFRESH_TOKEN));
+
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);
     };
@@ -110,11 +113,12 @@ export default function DashboardprofileAction() {
             <Button
                 sx={{
                     ...cssStyles.hoverInverse,
-                    border: "1px solid var(--border-main-70)",
+                    border: "1px solid var(--border-inverse)",
                     padding: "0px",
-                    minWidth: "35px",
-                    width: "35px",
-                    height: "35px",
+                    minWidth: "45px",
+                    minHeight: "45px",
+                    width: "45px",
+                    height: "45px",
                     borderRadius: "50%",
                 }}
                 id={buttonId}

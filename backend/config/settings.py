@@ -271,6 +271,9 @@ MEDIA_ROOT = BASE_DIR / "media"
 # CORS
 CORS_ALLOWED_ORIGINS = env.list("CORS_ALLOWED_ORIGINS", default=[])
 
+# CORS Credentials
+CORS_ALLOW_CREDENTIALS = env.bool("CORS_ALLOW_CREDENTIALS", default=True,)
+
 # CSRF
 CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS", default=[])
 

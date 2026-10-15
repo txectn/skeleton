@@ -46,8 +46,6 @@ const buttonStyles = {
     }
 };
 
-console.log(buttonStyles);
-
 // Child item
 function DashboardDropdownChild({
     item,

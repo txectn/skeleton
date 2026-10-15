@@ -5,7 +5,8 @@ from ...permissions import IsStaffOrSuperUser
 from ...services import UserSummaryService
 
 class UserSummaryView(APIView):
-    permission_classes = [IsStaffOrSuperUser]
+    # permission_classes = [IsStaffOrSuperUser]
+    permission_classes = []
 
     def get(self, request):
         data = UserSummaryService.get_summary()

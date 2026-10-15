@@ -11,33 +11,49 @@ import { useVerifyAuth } from "../../hooks/queries/authVerify";
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-    const { data } = useVerifyAuth();
+    const { data, isPending, isError } = useVerifyAuth();
 
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [authStatus, setAuthStatus] = useState("loading");
 
     useEffect(() => {
-        if (data !== undefined) {
-            setIsAuthenticated(data?.success);
+        if (isPending) return;
+
+        if (isError || data === undefined) {
+            setAuthStatus("unauthenticated");
+            return;
         }
-        console.log("succes: " + data?.success);
-    }, [data]);
+
+        setAuthStatus(
+            data?.success === true
+                ? "authenticated"
+                : "unauthenticated"
+        );
+    }, [data, isPending, isError]);
 
     const login = () => {
-        setIsAuthenticated(true);
+        setAuthStatus("authenticated");
     };
 
     const logout = () => {
-        setIsAuthenticated(false);
+        setAuthStatus("unauthenticated");
     };
+
+    const isAuthenticated = authStatus === "authenticated";
 
     const value = useMemo(
         () => ({
+            authStatus,
             isAuthenticated,
             login,
             logout,
         }),
-        [isAuthenticated]
+        [authStatus, isAuthenticated]
     );
+
+    // Handle initial verification inside the provider.
+    if (authStatus === "loading") {
+        return null;
+    }
 
     return (
         <AuthContext.Provider value={value}>

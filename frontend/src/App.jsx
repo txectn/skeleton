@@ -12,6 +12,7 @@ import CartTest from "./pages/x"
 import Dashboard from "./pages/dashboard/dashboard"
 import { DASHBOARD_ENDPOINT } from "./config"
 import RequireAuth from "./context/auth/RequireAuth"
+import Accounts from "./pages/dashboard/accounts/accounts"
 
 export default function App() {
   return (
@@ -30,7 +31,7 @@ export default function App() {
 
         <Route path={DASHBOARD_ENDPOINT} element={<RequireAuth><Dashboard /></RequireAuth>}>
            <Route index element={<div>Dashboard</div>} />
-           <Route path="accounts" element={<div>accounts</div>} />
+           <Route path="accounts" element={<Accounts />} />
            <Route path="products" element={<div>products</div>} />
            <Route path="orders" element={<div>orders</div>} />
         </Route>

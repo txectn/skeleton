@@ -5,6 +5,7 @@ import Link from "@mui/material/Link";
 import IconButton from '@mui/material/IconButton';
 import List from "@mui/material/List";
 import Divider from '@mui/material/Divider';
+import Drawer from '@mui/material/Drawer';
 
 // lucide icons
 import {
@@ -22,7 +23,7 @@ import { iconsStyles, logoStyles } from "./dashboardStyle";
 import { DASHBOARD_ENDPOINT } from '../../config'
 import styles from "./dashboard.module.css"
 import DashboardDropdown from "./dropdowns/dashboardDropdown";
-import DashboardprofileAction from "./profile/profile";
+import DashboardprofileAction from "./profile/profileAction";
 
 export default function Dashboard() {
     const [open, setOpen] = useState(true);
@@ -132,7 +133,7 @@ export default function Dashboard() {
                             aria-label="menu"
                             sx={{
                                 ml: 0,
-                                mr: 0.4,
+                                mr: 1.7,
                                 "&:hover": { backgroundColor: "transparent" },
                             }}
                             className={` ${styles.menuButtonDesktop} ${styles.menuButton}`}
@@ -186,6 +187,20 @@ export default function Dashboard() {
             <aside className={`${styles.drawer} ${styles.transition} ${open ? styles.drawerOpen : ""}`}>
                 {drawerElements(open)}
             </aside>
+            <Drawer
+                className={styles.mobileDrawer}
+                open={mobileOpen}
+                onClose={toggleDrawer}
+                anchor="left"
+                sx={{
+                    "& .MuiDrawer-paper": {
+                        width: 260,
+                        backgroundColor: "var(--bg-main)",
+                    },
+                }}
+            >
+                {drawerElements(mobileOpen, setMobileOpen, true)}
+            </Drawer>
             <main className={`${styles.main}`}>
                 <Outlet />
                 <footer className={styles.footer}>© {new Date().getFullYear()} OGON. All rights reserved.</footer>
