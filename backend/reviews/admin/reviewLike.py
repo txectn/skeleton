@@ -1,9 +1,10 @@
 from django.contrib import admin
+from unfold.admin import ModelAdmin
 
 from ..models import ReviewLike
 
 @admin.register(ReviewLike)
-class ReviewLikeAdmin(admin.ModelAdmin):
+class ReviewLikeAdmin(ModelAdmin):
     list_display = (
         "id",
         "review",
@@ -33,4 +34,33 @@ class ReviewLikeAdmin(admin.ModelAdmin):
 
     readonly_fields = (
         "created_at",
+    )
+
+    list_per_page = 25
+    date_hierarchy = "created_at"
+    list_select_related = (
+        "user",
+        "review",
+    )
+
+    fieldsets = (
+        (
+            "Like Information",
+            {
+                "classes": ("tab",),
+                "fields": (
+                    "review",
+                    "user",
+                ),
+            },
+        ),
+        (
+            "Timestamps",
+            {
+                "classes": ("tab",),
+                "fields": (
+                    "created_at",
+                ),
+            },
+        ),
     )

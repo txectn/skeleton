@@ -8,14 +8,13 @@ from .model import ModelSerializer
 from .category import CategorySerializer
 from .collection import CollectionSerializer
 from .tag import TagSerializer
-from .option import OptionSerializer
 from .variant import VariantSerializer
+from .option import OptionSerializer  # Imported to serialize the product's option pool
 from .metafield import MetafieldSerializer
 
 from promotions.services import PromotionResponseService
 
 class ProductDetailSerializer(serializers.ModelSerializer):
-
     media = MediaSerializer(
         many=True,
         read_only=True,
@@ -43,6 +42,7 @@ class ProductDetailSerializer(serializers.ModelSerializer):
         read_only=True,
     )
 
+    # The product's shared pool of options (e.g., all available colors & storage sizes)
     options = OptionSerializer(
         many=True,
         read_only=True,
@@ -77,8 +77,8 @@ class ProductDetailSerializer(serializers.ModelSerializer):
 
             "metafields",
 
-            "options",
-            "variants",
+            "options",   # Added: Product-level option pool
+            "variants",  # Each variant references options from this pool
 
             # No Relation
             "is_active",
@@ -92,7 +92,6 @@ class ProductDetailSerializer(serializers.ModelSerializer):
         ]
 
 class ProductListVariantSerializer(serializers.ModelSerializer):
-
     code = serializers.CharField(
         source="currency.code",
         read_only=True,
@@ -122,7 +121,6 @@ class ProductListVariantSerializer(serializers.ModelSerializer):
         return PromotionResponseService.get_promotion(variant)
 
 class ProductListSerializer(serializers.ModelSerializer):
-
     media = MediaSerializer(
         many=True,
         read_only=True,
@@ -162,4 +160,3 @@ class ProductListSerializer(serializers.ModelSerializer):
             variant,
             context=self.context,
         ).data
-

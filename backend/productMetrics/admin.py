@@ -7,6 +7,7 @@ from .models import ProductMetrics, ProductMetricsSnapshot
 @admin.register(ProductMetrics)
 class ProductMetricsAdmin(ModelAdmin):
     list_display = (
+        "id",
         "product",
         "view_count",
         "cart_add_count",
@@ -17,7 +18,13 @@ class ProductMetricsAdmin(ModelAdmin):
         "updated_at",
     )
 
+    list_display_links = (
+        "id",
+        "product",
+    )
+
     search_fields = (
+        "product__id",
         "product__name",
         "product__product_code",
     )
@@ -32,13 +39,13 @@ class ProductMetricsAdmin(ModelAdmin):
     )
 
     readonly_fields = (
-        # "product",
-        # "view_count",
-        # "cart_add_count",
-        # "wishlist_count",
-        # "sold_count",
-        # "trending_score",
-        # "popularity_score",
+        "product",
+        "view_count",
+        "cart_add_count",
+        "wishlist_count",
+        "sold_count",
+        "trending_score",
+        "popularity_score",
         "updated_at",
     )
 

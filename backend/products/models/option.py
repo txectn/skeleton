@@ -28,18 +28,20 @@ class Option(models.Model):
     class Meta:
         ordering = ("position", "id")
         constraints = (
+            # Ensures the same value can't be added twice for the same variable on a product
             models.UniqueConstraint(
                 fields=("product", "option_variable", "value"),
                 name="unique_product_option_variable_value",
             ),
+            # Ensures position numbers can't repeat within the SAME option variable for this product
             models.UniqueConstraint(
-                fields=("product","position"),
-                name="unique_product_option_position",
-            )
+                fields=("product", "option_variable", "position"),
+                name="unique_product_variable_position",
+            ),
         )
         indexes = (
             models.Index(fields=("product", "option_variable")),
-            models.Index(fields=("product", "position")),
+            models.Index(fields=("product", "option_variable", "position")),
         )
 
     def __str__(self):

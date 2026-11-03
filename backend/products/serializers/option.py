@@ -3,7 +3,6 @@ from rest_framework import serializers
 from ..models import Option
 
 class OptionSerializer(serializers.ModelSerializer):
-
     name = serializers.CharField(
         source="option_variable.name",
         read_only=True,

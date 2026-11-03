@@ -15,5 +15,7 @@ from .option import OptionAdmin
 from .option_variable import OptionVariableAdmin
 from .inventory import InventoryAdmin
 
+from .inventoryStockLevel import InventoryStockLevelAdmin
+
 # Synonyms
 from .synonym import SynonymGroupAdmin, SynonymTermAdmin

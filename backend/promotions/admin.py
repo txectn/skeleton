@@ -7,6 +7,7 @@ from .models import Promotion, PromotionVariant
 @admin.register(Promotion)
 class PromotionAdmin(ModelAdmin):
     list_display = (
+        "id",
         "name",
         "discount_type",
         "discount_value",
@@ -15,9 +16,15 @@ class PromotionAdmin(ModelAdmin):
         "created_at",
     )
 
+    list_display_links = (
+        "id",
+        "name",
+    )
+
     list_filter = (
-        "discount_type",
         "is_active",
+        "discount_type",
+        "created_at",
     )
 
     search_fields = (

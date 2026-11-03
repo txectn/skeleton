@@ -1,12 +1,10 @@
 from rest_framework.exceptions import ValidationError
+from django.db import transaction
 
 from ..models import Order
 from payments.models import Payment, PaymentAttempt
-
-from payments.services import (
-    BkashRefundService,
-    # NagadRefundService,
-)
+from payments.services import BkashRefundService
+from .releaseOrderInventory import release_order_inventory  # Import the release function
 
 class OrderCancelService:
 
@@ -16,9 +14,10 @@ class OrderCancelService:
     )
 
     @classmethod
+    @transaction.atomic
     def cancel(cls, *, user, order):
 
-        # Check if order belongs to user
+        # 1. Check if order belongs to user
         if order.user_id != user.id:
             raise ValidationError(
                 {
@@ -26,7 +25,7 @@ class OrderCancelService:
                 }
             )
 
-        # check if it cancelled or not
+        # 2. Check if cancelled or not
         if order.status == Order.Status.CANCELLED:
             raise ValidationError(
                 {
@@ -36,7 +35,17 @@ class OrderCancelService:
                 }
             )
 
-        # Check if order can be cancelled
+        # 3. Check if order is failed
+        if order.status == Order.Status.FAILED:
+            raise ValidationError(
+                {
+                    "message": "This order is failed.",
+                    "order_id": order.id,
+                    "order_status": order.status,
+                }
+            )
+
+        # 4. Check if order can be cancelled
         if order.status not in (
             Order.Status.PENDING,
             Order.Status.CONFIRMED,
@@ -53,59 +62,12 @@ class OrderCancelService:
         # Get payment
         try:
             payment = order.payment
-
         except Payment.DoesNotExist:
             payment = None
 
-        # No payment means there is nothing to refund
-        if payment is None:
-            order.status = Order.Status.CANCELLED
-            order.save(
-                update_fields=[
-                    "status", 
-                    "updated_at"
-                ]
-            )
-            return {
-                "message": "Order cancelled successfully.",
-                "order_id": order.id,
-                "order_status": order.status,
-            }
+        # 5. Handle Online Payment Refunds FIRST (External API can fail here)
+        if payment and payment.method == Payment.Method.ONLINE and payment.status == Payment.Status.PAID:
 
-        # COD does not require a payment attempt or refund
-        if payment.method == Payment.Method.COD:
-            order.status = Order.Status.CANCELLED
-            order.save(
-                update_fields=[
-                    "status", 
-                    "updated_at"
-                ]
-            )
-            return {
-                "message": "Order cancelled successfully.",
-                "order_id": order.id,
-                "order_status": order.status,
-            }
-
-        # Online payment
-        if payment.method == Payment.Method.ONLINE:
-
-            # Not paid → no refund required
-            if payment.status != Payment.Status.PAID:
-                order.status = Order.Status.CANCELLED
-                order.save(
-                    update_fields=[
-                        "status", 
-                        "updated_at"
-                    ]
-                )
-                return {
-                    "message": "Order cancelled successfully.",
-                    "order_id": order.id,
-                    "order_status": order.status,
-                }
-
-            # Paid online payment → find successful attempt
             payment_attempt = (
                 payment.attempts
                 .filter(status=PaymentAttempt.Status.SUCCESS)
@@ -123,11 +85,9 @@ class OrderCancelService:
                 )
 
             provider = payment_attempt.provider
-
             provider_service = None
 
             for service in cls.PROVIDERS:
-
                 if service.select_service(provider):
                     provider_service = service
                     break
@@ -155,23 +115,18 @@ class OrderCancelService:
                 )
 
             payment.status = Payment.Status.REFUNDED
-            payment.save(
-                update_fields=[
-                    "status", 
-                    "updated_at"
-                ]
-            )
-            
-            order.status = Order.Status.CANCELLED
-            order.save(
-                update_fields=[
-                    "status", 
-                    "updated_at"
-                ]
-            )
+            payment.save(update_fields=["status", "updated_at"])
 
-            return {
-                "message": "Order cancelled successfully.",
-                "order_id": order.id,
-                "order_status": order.status,
-            }
+        # -------------------------------------------------------------
+        # 6. ALL CHECKS & REFUNDS PASSED: Release inventory & cancel order once for all cases
+        # -------------------------------------------------------------
+        release_order_inventory(order)
+
+        order.status = Order.Status.CANCELLED
+        order.save(update_fields=["status", "updated_at"])
+
+        return {
+            "message": "Order cancelled successfully.",
+            "order_id": order.id,
+            "order_status": order.status,
+        }

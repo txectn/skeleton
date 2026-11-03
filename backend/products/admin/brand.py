@@ -8,6 +8,7 @@ from ..models import Brand
 class BrandAdmin(ModelAdmin):
 
     list_display = (
+        "id",
         "name",
         "slug",
         "product_count",
@@ -15,12 +16,14 @@ class BrandAdmin(ModelAdmin):
     )
 
     list_display_links = (
+        "id",
         "name",
     )
 
     search_fields = (
+        "=id",
         "name",
-        "slug",
+        "=slug",
         "description",
     )
 
@@ -31,6 +34,7 @@ class BrandAdmin(ModelAdmin):
     list_per_page = 50
 
     list_filter = (
+        "name",
         "created_at",
     )
 

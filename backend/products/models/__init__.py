@@ -15,6 +15,8 @@ from .option import Option
 from .option_variable import OptionVariable
 from .inventory import Inventory
 
+from .inventoryStockLevel import InventoryStockLevel
+
 # Synonyms
 from .synonymGroup import SynonymGroup
 from .synonymTerm import SynonymTerm

@@ -1,6 +1,11 @@
+import re
 from django import forms
 from django.contrib import admin
 from django.db.models import Count
+from django.forms.widgets import ClearableFileInput
+from django.utils.safestring import mark_safe
+
+from django.contrib.admin import RelatedFieldListFilter
 
 from unfold.admin import ModelAdmin, StackedInline, TabularInline
 
@@ -9,26 +14,14 @@ from ..models import (
     Media, 
     Variant,
     Inventory,
-    Option
+    Option,
+    Metafield,
 )
 from promotions.models import PromotionVariant
 
-class VariantInlineForm(forms.ModelForm):
-    class Meta:
-        model = Variant
-        fields = "__all__"
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        if self.instance and self.instance.product_id:
-            self.fields["options"].queryset = (
-                Option.objects
-                .filter(product_id=self.instance.product_id)
-                .select_related("option_variable")
-            )
-        else:
-            self.fields["options"].queryset = Option.objects.none()
+class MetafieldInline(TabularInline):
+    model = Metafield
+    extra = 0
 
 class InventoryInline(StackedInline):
     model = Inventory
@@ -39,27 +32,127 @@ class PromotionVariantInline(TabularInline):
     model = PromotionVariant
     extra = 0
 
+class OptionInline(TabularInline):
+    model = Option
+    extra = 1
+    classes = ["option-inline"]
+    fields = (
+        "option_variable",
+        "value",
+        "position",
+    )
+
+class VariantInlineForm(forms.ModelForm):
+    class Meta:
+        model = Variant
+        fields = "__all__"
+        widgets = {
+            "options": forms.CheckboxSelectMultiple(),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance and self.instance.product_id:
+            self.fields["options"].queryset = (
+                Option.objects.filter(product_id=self.instance.product_id)
+                .select_related("option_variable")
+            )
+        else:
+            self.fields["options"].queryset = Option.objects.none()
+
 class VariantInline(StackedInline):
     model = Variant
     form = VariantInlineForm
-    extra = 0
+    extra = 0    
+
+    fields = (
+        "sku",
+        "price",
+        "compare_at_price",
+        "cost_price",
+        "currency",
+        "options",
+        "position",
+        "purchase_limit",
+        "is_active",
+    )
 
     inlines = (
         InventoryInline,
         PromotionVariantInline,
     )
 
-class OptionInline(TabularInline):
-    model = Option
-    extra = 1
+# --- CONDITIONAL MEDIA FILE WIDGET ---
+class MediaFileAdminWidget(ClearableFileInput):
+    def render(self, name, value, attrs=None, renderer=None):
+        widget_output = super().render(name, value, attrs, renderer)
+        
+        if value and hasattr(value, "url"):
+            url = value.url.lower()
+            image_extensions = (".jpg", ".jpeg", ".png", ".gif", ".webp", ".svg")
+            
+            if url.endswith(image_extensions):
+                # 1. Remove the redundant "Currently: <filename><br>" text
+                widget_output = re.sub(
+                    r'Currently:\s*<a[^>]*>.*?</a>(<br\s*/?>)?', 
+                    '', 
+                    widget_output, 
+                    flags=re.IGNORECASE
+                )
+                
+                # 2. Clean up old text labels preceding the file input
+                widget_output = re.sub(
+                    r'(Change:|<label[^>]*>.*?</label>)\s*', 
+                    '', 
+                    widget_output, 
+                    flags=re.IGNORECASE
+                )
+                
+                # 3. Use custom clean wrapper with the line clamping styles on the file name span
+                unique_id = attrs.get('id', f'id_{name}') if attrs else f'id_{name}'
+                widget_output = f'''
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <label style="display: inline-block; cursor: pointer; font-size: 12px;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-cloud-upload preview-icon"><path d="M12 13v8"/><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="m8 17 4-4 4 4"/></svg>
+                            <input type="file" name="{name}" id="{unique_id}" style="display: none;" onchange="document.getElementById('filename-{unique_id}').textContent = this.files[0] ? this.files[0].name : ''">
+                        </label>
+                        <span id="filename-{unique_id}" style="font-size: 12px; opacity: 0.8; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 1; overflow: hidden;"></span>
+                    </div>
+                '''
+                
+                return mark_safe(f'''
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div>
+                            <a href="{value.url}" target="_blank">
+                                <img src="{value.url}" style="dipslay: block; width: 40px; max-width: 40px; max-width: 40px; height: 40px; object-fit: cover;" flex-shrink="0" />
+                            </a>
+                        </div>
+                        <div>
+                            {widget_output}
+                        </div>
+                    </div>
+                ''')
+                
+        return widget_output
+ 
+class MediaAdminForm(forms.ModelForm):
+    class Meta:
+        model = Media
+        fields = "__all__"
+        widgets = {
+            "file": MediaFileAdminWidget(),
+        }
 
 class MediaInline(TabularInline):
     model = Media
+    form = MediaAdminForm
     extra = 0
+# ------------------------------------
 
 @admin.register(Product)
 class ProductAdmin(ModelAdmin):
     list_display = (
+        "id",
         "name",
         "brand",
         "model",
@@ -71,12 +164,14 @@ class ProductAdmin(ModelAdmin):
     )
 
     list_display_links = (
+        "id",
         "name",
     )
 
     search_fields = (
+        "=id",
         "name",
-        "slug",
+        "=slug",
         "description",
         "brand__name",
         "model__name",
@@ -87,6 +182,9 @@ class ProductAdmin(ModelAdmin):
         "is_active",
         "brand",
         "category",
+        "model",
+        "collections",
+        "tags",
         "created_at",
         "updated_at",
     )
@@ -122,6 +220,7 @@ class ProductAdmin(ModelAdmin):
     filter_horizontal = ()
 
     inlines = (
+        MetafieldInline,
         MediaInline,
         OptionInline,
         VariantInline,

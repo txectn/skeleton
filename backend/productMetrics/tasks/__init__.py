@@ -6,4 +6,5 @@ from .metricsTask import (
     record_product_trending,
     record_product_popularity,
     update_all_product_popularity,
+    record_product_sold
 )

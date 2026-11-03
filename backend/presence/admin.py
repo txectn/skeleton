@@ -7,6 +7,7 @@ from .models import Presence
 
 @admin.register(Presence)
 class PresenceAdmin(ModelAdmin):
+
     list_display = (
         "presence_id",
         "user",
@@ -37,25 +38,48 @@ class PresenceAdmin(ModelAdmin):
 
     readonly_fields = (
         "presence_id",
+        "device_id",
+        "fingerprint",
+        "user",
+        "ip_address",
+        "user_agent",
+        "browser",
+        "browser_version",
+        "operating_system",
+        "os_version",
+        "device_type",
         "first_seen_at",
         "last_seen_at",
         "status",
     )
 
-    ordering = (
-        "-last_seen_at",
-    )
+    ordering = ("-last_seen_at",)
 
     list_per_page = 50
 
     @admin.display(description="Status")
     def status(self, obj):
-        elapsed = timezone.now() - obj.last_seen_at
+        if not obj or not obj.last_seen_at:
+            return "Never seen"
 
-        if elapsed.total_seconds() < 60:
+        elapsed = (timezone.now() - obj.last_seen_at).total_seconds()
+
+        if elapsed < 60:
             return "Online"
 
-        if elapsed.total_seconds() < 600:
+        if elapsed < 600:
             return f"Last seen {timesince(obj.last_seen_at)} ago"
 
         return f"Last seen at {obj.last_seen_at.strftime('%I:%M %p').lstrip('0')}"
+
+    # Disable manual creation
+    def has_add_permission(self, request):
+        return False
+
+    # Disable deletion
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    # Disable editing
+    def has_change_permission(self, request, obj=None):
+        return False

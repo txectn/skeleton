@@ -7,6 +7,7 @@ from ..models import Collection
 @admin.register(Collection)
 class CollectionAdmin(ModelAdmin):
     list_display = (
+        "id",
         "name",
         "slug",
         "product_count",
@@ -14,16 +15,19 @@ class CollectionAdmin(ModelAdmin):
     )
 
     list_display_links = (
+        "id",
         "name",
     )
 
     search_fields = (
+        "=id",
         "name",
-        "slug",
+        "=slug",
         "description",
     )
 
     list_filter = (
+        "name",
         "created_at",
     )
 

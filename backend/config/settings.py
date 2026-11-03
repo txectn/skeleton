@@ -6,6 +6,8 @@ import os
 
 import environ
 
+from .admin.UNFOLD import UNFOLD
+
 # Base directory
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -60,6 +62,7 @@ INSTALLED_APPS = [
     "common",
     "products",
     "productMetrics",
+    "metrics",
     "presence",
     "cart",
     "reviews",
@@ -67,7 +70,6 @@ INSTALLED_APPS = [
     "orders",
     "payments",
     "returns",
-    "dashboard",
     "siteConfig",
 ]
 
@@ -236,6 +238,7 @@ SIMPLE_JWT = {
     ),
 }
 
+UNFOLD = UNFOLD
 
 # Language
 LANGUAGE_CODE = "en-us"
@@ -307,6 +310,21 @@ CELERY_BEAT_SCHEDULE = {
         "schedule": crontab(
             hour=0,
             minute=15,
+        ),
+    },
+    "record-analytics-metrics": {
+        "task": "metrics.tasks.create_metrics_snapshot",
+        "schedule": crontab(
+            hour=0,
+            minute=20,
+        )
+    },
+    "record-total-products": {
+        "task": "metrics.tasks.record_total_products",
+        "schedule": crontab(
+            hour=0,
+            minute=25,
+            # minute="*",
         ),
     },
     "payment-reconciliation": {

@@ -47,17 +47,14 @@ def record_product_wishlist(product_id: int) -> None:
     retry_backoff=True,
     retry_kwargs={"max_retries": 5},
 )
-def record_product_sold(product_id: int) -> None:
+def record_product_sold(product_id: int, quantity: int = 1) -> None:
     """
-    Atomically increment the sold count for a product.
-
-    ProductMetrics is expected to exist because it is automatically
-    created when the Product is created.
+    Atomically increment the sold count for a product by the given quantity.
     """
     ProductMetrics.objects.filter(
         product_id=product_id,
     ).update(
-        sold_count=F("sold_count") + 1,
+        sold_count=F("sold_count") + quantity,
     )
 
 # Record the cart add count for a product

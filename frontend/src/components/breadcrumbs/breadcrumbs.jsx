@@ -24,18 +24,20 @@ const currentStyle = {
     opacity: 0.6,
 };
 
+const breadCrumbStyle = {
+    "& .MuiBreadcrumbs-separator": {
+        color: "var(--text-main)",
+        fontSize: "var(--fs-sm-md)",
+        fontWeight: "var(--fw-medium)",
+    },
+}
+
 export default function BreadcrumbsComponent({ data = [] }) {
     return (
         <Breadcrumbs
             separator="›"
             aria-label="breadcrumb"
-            sx={{
-                "& .MuiBreadcrumbs-separator": {
-                    color: "var(--text-main)",
-                    fontSize: "var(--fs-sm-md)",
-                    fontWeight: "var(--fw-medium)",
-                },
-            }}
+            sx={breadCrumbStyle}
         >
             {data.map((item, index) =>
                 item.current ? (

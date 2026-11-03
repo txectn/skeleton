@@ -1,12 +1,17 @@
 from rest_framework.exceptions import ValidationError
+from django.core.exceptions import ObjectDoesNotExist
+from django.db import transaction
 
 from common.services import QuantityValidator
 
 from ..models import OrderItem
 
+from products.models import Inventory
+
 class OrderItemService:
 
     @staticmethod
+    @transaction.atomic
     def create(
         order,
         variant,
@@ -46,6 +51,32 @@ class OrderItemService:
                     ],
                 }
             )
+
+        # ---------------------------------------------------------
+        # Get Inventory & Lock Row (Concurrency Protection)
+        # ---------------------------------------------------------
+
+        try:
+            inventory = Inventory.objects.select_for_update().get(
+                variant=variant
+            )
+
+        except ObjectDoesNotExist:
+            raise ValidationError(
+                {
+                    "variant": (
+                        "This variant is not available."
+                    )
+                }
+            )
+
+        # ---------------------------------------------------------
+        # Update Reserved Quantity
+        # ---------------------------------------------------------
+
+        inventory.reserved_quantity += quantity
+        inventory.clean()  # Triggers model validation (checks if reserved > quantity)
+        inventory.save(update_fields=["reserved_quantity", "updated_at"])
 
         # ---------------------------------------------------------
         # Promotion pricing

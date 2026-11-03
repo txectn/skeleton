@@ -8,6 +8,7 @@ from ..models import Model
 @admin.register(Model)
 class ModelAdmin(ModelAdmin):
     list_display = (
+        "id",
         "name",
         "brand",
         "slug",
@@ -16,16 +17,19 @@ class ModelAdmin(ModelAdmin):
     )
 
     list_display_links = (
+        "id",
         "name",
     )
 
     search_fields = (
+        "=id",
         "name",
-        "slug",
+        "=slug",
         "brand__name",
     )
 
     list_filter = (
+        "name",
         "brand",
         "created_at",
     )

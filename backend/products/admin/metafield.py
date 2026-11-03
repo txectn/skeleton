@@ -7,6 +7,7 @@ from ..models import Metafield
 @admin.register(Metafield)
 class MetafieldAdmin(ModelAdmin):
     list_display = (
+        "id",
         "product",
         "namespace",
         "key",
@@ -15,10 +16,12 @@ class MetafieldAdmin(ModelAdmin):
     )
 
     list_display_links = (
+        "id",
         "key",
     )
 
     search_fields = (
+        "=id",
         "product__name",
         "namespace",
         "key",

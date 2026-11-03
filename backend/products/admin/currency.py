@@ -16,6 +16,10 @@ class CurrencyAdmin(ModelAdmin):
         "code",
     )
 
+    list_display_links = (
+        "code",
+    )
+
     search_fields = (
         "code",
         "name",

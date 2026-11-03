@@ -8,6 +8,7 @@ from ..models import Category
 @admin.register(Category)
 class CategoryAdmin(ModelAdmin):
     list_display = (
+        "id",
         "name",
         "parent",
         "slug",
@@ -16,17 +17,20 @@ class CategoryAdmin(ModelAdmin):
     )
 
     list_display_links = (
+        "id",
         "name",
     )
 
     search_fields = (
+        "=id",
         "name",
-        "slug",
+        "=slug",
         "description",
         "parent__name",
     )
 
     list_filter = (
+        "name",
         "parent",
         "created_at",
     )

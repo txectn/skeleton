@@ -2,6 +2,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from siteConfig.models import SiteSetting
+
 from ..serializers import CheckoutReviewSerializer, CheckoutReviewItemSerializer
 from ..services import CheckoutReviewService
 
@@ -24,10 +26,22 @@ class CheckoutReviewView(APIView):
             many=True,
         )
 
-        return Response(
-            serializer.data,
-        )
+        site_setting = SiteSetting.objects.first()
 
+        defaulst_currency = {
+            "symbol": site_setting.default_currency.symbol,
+            "code": site_setting.default_currency.code,
+            "name": site_setting.default_currency.name
+        }
+
+        # return Response(
+        #     serializer.data,
+        # )
+
+        return Response({
+            "currency": defaulst_currency,
+            "items": serializer.data,
+        })
 
 
 

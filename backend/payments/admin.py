@@ -1,9 +1,11 @@
 from django.contrib import admin
 
+from unfold.admin import ModelAdmin
+
 from .models import Payment, PaymentAttempt
 
 @admin.register(Payment)
-class PaymentAdmin(admin.ModelAdmin):
+class PaymentAdmin(ModelAdmin):
 
     list_display = (
         "id",
@@ -14,13 +16,19 @@ class PaymentAdmin(admin.ModelAdmin):
         "updated_at",
     )
 
+    list_display_links = (
+        "id",
+        "order",
+    )
+
     list_filter = (
         "method",
         "status",
     )
 
     search_fields = (
-        "order__id",
+        "=id",
+        "=order__id",
         "order__user__email",
     )
 
@@ -31,7 +39,7 @@ class PaymentAdmin(admin.ModelAdmin):
 
 
 @admin.register(PaymentAttempt)
-class PaymentAttemptAdmin(admin.ModelAdmin):
+class PaymentAttemptAdmin(ModelAdmin):
 
     list_display = (
         "id",
@@ -49,8 +57,9 @@ class PaymentAttemptAdmin(admin.ModelAdmin):
     )
 
     search_fields = (
+        "=id",
         "transaction_id",
-        "payment__order__id",
+        "=payment__order__id",
         "payment__order__user__email",
     )
 

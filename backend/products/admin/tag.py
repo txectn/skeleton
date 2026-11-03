@@ -7,18 +7,31 @@ from ..models import Tag
 @admin.register(Tag)
 class TagAdmin(ModelAdmin):
     list_display = (
+        "id",
         "name",
         "slug",
         "product_count",
+        "created_at",
     )
 
     list_display_links = (
+        "id",
         "name",
     )
 
     search_fields = (
+        "=id",
         "name",
-        "slug",
+        "=slug",
+    )
+
+    list_filter = (
+        "name",
+        "created_at",
+    )
+
+    readonly_fields = (
+        "created_at",
     )
     
     prepopulated_fields = {

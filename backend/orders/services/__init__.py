@@ -7,3 +7,8 @@ from .orderService import OrderService
 from .orderShippingService import OrderShippingService
 
 from .orderCancelService import OrderCancelService
+
+from .orderFulfillmentService import process_order_fulfillment
+from .releaseOrderInventory import release_order_inventory
+from .orderFailureProccessService import process_order_failure
+from .orderCancelProccessService import process_order_cancellation

@@ -13,4 +13,5 @@ class PaymentSerializer(serializers.Serializer):
     provider = serializers.CharField(
         required=False,
         allow_blank=True,
+        default="",
     )

@@ -1,5 +1,7 @@
 from django.db import models
 
+from products.models import Currency
+
 class SiteSetting(models.Model):
 
     site_name = models.CharField(
@@ -34,6 +36,12 @@ class SiteSetting(models.Model):
     timezone = models.CharField(
         max_length=50,
         default="Asia/Dhaka",
+    )
+
+    default_currency = models.ForeignKey(
+        Currency,
+        on_delete=models.PROTECT,
+        related_name="+",
     )
 
     updated_at = models.DateTimeField(

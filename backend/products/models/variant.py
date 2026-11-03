@@ -32,6 +32,7 @@ class Variant(models.Model):
         blank=True,
     )
 
+    # Added back: Many-to-Many field pointing to the product's Option pool
     options = models.ManyToManyField(
         "products.Option",
         related_name="variants",
@@ -99,6 +100,16 @@ class Variant(models.Model):
                     "cost_price": "Cost price cannot be negative."
                 }
             )
+
+        # Optional safety check: ensure selected options belong to the same product
+        if self.pk:
+            invalid_options = self.options.exclude(product=self.product)
+            if invalid_options.exists():
+                raise ValidationError(
+                    {
+                        "options": "All selected options must belong to this variant's product."
+                    }
+                )
 
     def __str__(self):
         return self.sku

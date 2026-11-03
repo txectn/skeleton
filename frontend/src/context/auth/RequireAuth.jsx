@@ -4,7 +4,7 @@ import { useAuth } from "./AuthProvider";
 const RequireAuth = ({ children }) => {
     const { isAuthenticated } = useAuth();
 
-    if (isAuthenticated) {
+    if (!isAuthenticated) {
         return <Navigate to="/auth" replace />;
     }
 

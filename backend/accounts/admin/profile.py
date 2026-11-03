@@ -1,9 +1,10 @@
 from django.contrib import admin
+from unfold.admin import ModelAdmin
 
 from ..models import Profile
 
 @admin.register(Profile)
-class ProfileAdmin(admin.ModelAdmin):
+class ProfileAdmin(ModelAdmin):
     list_display = (
         "id",
         "user",
@@ -13,6 +14,11 @@ class ProfileAdmin(admin.ModelAdmin):
         "region",
         "city",
         "created_at",
+    )
+
+    list_display_links = (
+        "id",
+        "user",
     )
 
     list_filter = (
@@ -38,36 +44,54 @@ class ProfileAdmin(admin.ModelAdmin):
         "updated_at",
     )
 
-    autocomplete_fields = (
-        "user",
-    )
+    autocomplete_fields = ("user",)
+
+    list_per_page = 25
+    date_hierarchy = "created_at"
+    list_select_related = ("user",)
 
     fieldsets = (
-        ("User", {
-            "fields": (
-                "user",
-            ),
-        }),
-        ("Personal Information", {
-            "fields": (
-                "avatar",
-                "phone_number",
-                "date_of_birth",
-                "gender",
-            ),
-        }),
-        ("Address", {
-            "fields": (
-                "address",
-                "country",
-                "region",
-                "city",
-            ),
-        }),
-        ("Timestamps", {
-            "fields": (
-                "created_at",
-                "updated_at",
-            ),
-        }),
+        (
+            "User Information",
+            {
+                "classes": ("tab",),
+                "fields": (
+                    "user",
+                ),
+            },
+        ),
+        (
+            "Personal Information",
+            {
+                "classes": ("tab",),
+                "fields": (
+                    "avatar",
+                    "phone_number",
+                    "date_of_birth",
+                    "gender",
+                ),
+            },
+        ),
+        (
+            "Address Information",
+            {
+                "classes": ("tab",),
+                "fields": (
+                    "address",
+                    "country",
+                    "region",
+                    "city",
+                ),
+            },
+        ),
+        (
+            "Timestamps",
+            {
+                "classes": ("tab",),
+                "fields": (
+                    "created_at",
+                    "updated_at",
+                ),
+            },
+        ),
     )
