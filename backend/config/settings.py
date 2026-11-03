@@ -71,6 +71,10 @@ INSTALLED_APPS = [
     "payments",
     "returns",
     "siteConfig",
+    "banner",
+    "blog",
+    "about",
+    "contact",
 ]
 
 # Middleware

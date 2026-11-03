@@ -15,6 +15,7 @@ urlpatterns = [
     path("api/", include("payments.urls")),
     path("api/", include("returns.urls")),
     path("api/", include("siteConfig.urls")),
+    path("api/", include("blog.urls")),
 ]
 
 if settings.DEBUG:

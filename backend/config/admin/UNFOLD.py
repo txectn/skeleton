@@ -179,6 +179,22 @@ UNFOLD = {
                 ]
             },
             {
+                "title": "CMS",
+                "collapsible": True,
+                "items": [
+                    {
+                        "title": "Blogs",
+                        "icon": "article",
+                        "link": "/admin/blog/blog/",
+                    },
+                    {
+                        "title": "Contact",
+                        "icon": "phone",
+                        "link": "/admin/contact/contactmessage/",
+                    }
+                ]
+            },
+            {
                 "title": "Analytics",
                 "collapsible": True,
                 "items": [
