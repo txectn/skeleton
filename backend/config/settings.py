@@ -201,6 +201,7 @@ REST_FRAMEWORK = {
         "anon": "100/minute",
         "user": "500/minute",
         "auth_throttle": "10/minute",
+        "contact_throttle": "10/minute",
     },
 }
 
@@ -348,7 +349,8 @@ AUTH_USER_MODEL = "accounts.User"
 # Captcha
 CAPTCHA_RATES = {
     "auth_captcha": "3/min",
-    "product_captcha": "3/min",
+    "product_captcha": "1/min",
+    "contact_captcha": "5/min",
 }
 
 # Custom throttling

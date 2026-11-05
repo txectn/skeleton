@@ -1,3 +1,2 @@
 from .captcha import CaptchaRunner
-
-__all__ = ["CaptchaRunner"]
+from .captchaMixin import CaptchaMixin

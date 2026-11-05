@@ -16,6 +16,8 @@ urlpatterns = [
     path("api/", include("returns.urls")),
     path("api/", include("siteConfig.urls")),
     path("api/", include("blog.urls")),
+    path("api/", include("contact.urls")),
+    path("api/", include("about.urls")),
 ]
 
 if settings.DEBUG:

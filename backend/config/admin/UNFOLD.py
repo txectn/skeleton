@@ -188,6 +188,11 @@ UNFOLD = {
                         "link": "/admin/blog/blog/",
                     },
                     {
+                        "title": "About",
+                        "icon": "info",
+                        "link": "/admin/about/aboutpage/",
+                    },
+                    {
                         "title": "Contact",
                         "icon": "phone",
                         "link": "/admin/contact/contactmessage/",

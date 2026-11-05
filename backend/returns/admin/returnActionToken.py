@@ -60,6 +60,7 @@ class ReturnActionTokenAdmin(ModelAdmin):
             },
         ),
     )
+    
     @admin.display(description="Token")
     def token_field(self, obj):
         if not obj or not obj.token:
