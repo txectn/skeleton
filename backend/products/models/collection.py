@@ -14,6 +14,12 @@ class Collection(models.Model):
         blank=True,
     )
 
+    thumbnail = models.ImageField(
+        upload_to="collections/",
+        blank=True,
+        null=True,
+    )
+
     created_at = models.DateTimeField(
         auto_now_add=True,
     )

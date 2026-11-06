@@ -1,11 +1,18 @@
 import re
 from django import forms
+
+from django.utils.html import format_html
+
 from django.contrib import admin
 from django.db.models import Count
 from django.forms.widgets import ClearableFileInput
 from django.utils.safestring import mark_safe
 
 from django.contrib.admin import RelatedFieldListFilter
+
+from django.contrib import messages
+from django.core.exceptions import ValidationError
+from django.forms.formsets import BaseFormSet
 
 from unfold.admin import ModelAdmin, StackedInline, TabularInline
 
@@ -31,6 +38,21 @@ class InventoryInline(StackedInline):
 class PromotionVariantInline(TabularInline):
     model = PromotionVariant
     extra = 0
+
+    def get_formset(self, request, obj=None, **kwargs):
+        formset = super().get_formset(request, obj, **kwargs)
+        original_clean = formset.clean
+
+        def clean(self):
+            original_clean(self)
+            # bubble up per-form errors to formset non-field errors
+            for form in self.forms:
+                if form.errors:
+                    for field, errs in form.errors.items():
+                        for err in errs:
+                            self._non_form_errors.append(err)  # see note
+        formset.clean = clean
+        return formset
 
 class OptionInline(TabularInline):
     model = Option
@@ -83,6 +105,7 @@ class VariantInline(StackedInline):
     )
 
 # --- CONDITIONAL MEDIA FILE WIDGET ---
+
 class MediaFileAdminWidget(ClearableFileInput):
     def render(self, name, value, attrs=None, renderer=None):
         widget_output = super().render(name, value, attrs, renderer)
@@ -90,8 +113,12 @@ class MediaFileAdminWidget(ClearableFileInput):
         if value and hasattr(value, "url"):
             url = value.url.lower()
             image_extensions = (".jpg", ".jpeg", ".png", ".gif", ".webp", ".svg")
+            video_extensions = (".mp4", ".webm", ".ogg", ".mov", ".avi", ".mkv", ".m4v")
             
-            if url.endswith(image_extensions):
+            is_image = url.endswith(image_extensions)
+            is_video = url.endswith(video_extensions)
+            
+            if is_image or is_video:
                 # 1. Remove the redundant "Currently: <filename><br>" text
                 widget_output = re.sub(
                     r'Currently:\s*<a[^>]*>.*?</a>(<br\s*/?>)?', 
@@ -120,12 +147,26 @@ class MediaFileAdminWidget(ClearableFileInput):
                     </div>
                 '''
                 
+                # 4. Build the preview (image or video) with the same 40x40 sizing
+                if is_image:
+                    preview_html = f'''
+                        <a href="{value.url}" target="_blank">
+                            <img src="{value.url}" style="display: block; width: 40px; max-width: 40px; height: 40px; object-fit: cover;" />
+                        </a>
+                    '''
+                else:  # is_video
+                    preview_html = f'''
+                        <a href="{value.url}" target="_blank" style="display: block; width: 40px; height: 40px;">
+                            <video src="{value.url}" muted playsinline preload="metadata"
+                                style="display: block; width: 40px; max-width: 40px; height: 40px; object-fit: cover; pointer-events: none;">
+                            </video>
+                        </a>
+                    '''
+                
                 return mark_safe(f'''
                     <div style="display: flex; align-items: center; gap: 10px;">
-                        <div>
-                            <a href="{value.url}" target="_blank">
-                                <img src="{value.url}" style="dipslay: block; width: 40px; max-width: 40px; max-width: 40px; height: 40px; object-fit: cover;" flex-shrink="0" />
-                            </a>
+                        <div style="flex-shrink: 0;">
+                            {preview_html}
                         </div>
                         <div>
                             {widget_output}
@@ -134,7 +175,7 @@ class MediaFileAdminWidget(ClearableFileInput):
                 ''')
                 
         return widget_output
- 
+
 class MediaAdminForm(forms.ModelForm):
     class Meta:
         model = Media
@@ -152,6 +193,7 @@ class MediaInline(TabularInline):
 @admin.register(Product)
 class ProductAdmin(ModelAdmin):
     list_display = (
+        "thumbnail",
         "id",
         "name",
         "brand",
@@ -164,6 +206,7 @@ class ProductAdmin(ModelAdmin):
     )
 
     list_display_links = (
+        "thumbnail",
         "id",
         "name",
     )
@@ -250,3 +293,20 @@ class ProductAdmin(ModelAdmin):
     )
     def variant_count(self, obj):
         return obj._variant_count
+
+    @admin.display(description="Thumbnail")
+    def thumbnail(self, obj):
+
+        media = obj.media.filter(
+            media_type=Media.MediaType.IMAGE,
+        ).first()
+
+        if not media:
+            return "NO IMAGE"
+
+        return format_html(
+            '<img src="{}" style="width:45px; height:45px; '
+            'object-fit:cover; border-radius:6px;" />',
+            media.file.url,
+        )
+        

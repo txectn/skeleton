@@ -1,6 +1,8 @@
 from django.contrib import admin
 from unfold.admin import ModelAdmin, TabularInline
 
+from django.utils.html import format_html
+
 from .models import (
     Blog,
     BlogMedia,
@@ -39,15 +41,16 @@ class BlogAdmin(ModelAdmin):
     ]
 
     list_display = (
+        "thumbnail_image",
         "id",
         "name",
-        "image",
         "is_published",
         "published_at",
         "created_at",
     )
 
     list_display_links = (
+        "thumbnail_image",
         "id",
         "name",
     )
@@ -106,6 +109,19 @@ class BlogAdmin(ModelAdmin):
             ),
         }),
     )
+
+    @admin.display(description="Thumbnail")
+    def thumbnail_image(self, obj):
+
+        if not obj.image.url:
+            return "NO IMAGE"
+
+        return format_html(
+            '<img src="{}" style="width:45px; height:45px; '
+            'object-fit:cover; border-radius:6px;" />',
+            obj.image.url,
+        )
+    
 
 # Blog Comment Admin
 @admin.register(BlogComment)

@@ -124,6 +124,11 @@ UNFOLD = {
                         "title": "Promotions",
                         "icon": "local_offer",
                         "link": "/admin/promotions/promotion/",
+                    },
+                    {
+                        "title": "Promotion For Variants",
+                        "icon": "inventory_2",
+                        "link": "/admin/promotions/promotionvariant/",
                     }
                 ]
             },
@@ -182,6 +187,11 @@ UNFOLD = {
                 "title": "CMS",
                 "collapsible": True,
                 "items": [
+                    {
+                        "title": "Banner",
+                        "icon": "slideshow",
+                        "link": "/admin/banner/banner/",
+                    },
                     {
                         "title": "Blogs",
                         "icon": "article",

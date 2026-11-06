@@ -10,10 +10,12 @@ class CollectionSerializer(serializers.ModelSerializer):
             "name",
             "slug",
             "description",
+            "thumbnail",
         ]
         read_only_fields = [
             "id",
             "name",
             "slug",
             "description",
+            "thumbnail",
         ]
